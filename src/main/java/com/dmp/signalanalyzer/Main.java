@@ -1,5 +1,6 @@
 package com.dmp.signalanalyzer;
 
+import com.dmp.signalanalyzer.analyzers.HighPassFilter;
 import com.dmp.signalanalyzer.analyzers.ISignalAnalyzer;
 import com.dmp.signalanalyzer.analyzers.MaximumAnalysis;
 import com.dmp.signalanalyzer.analyzers.MeanAnalysis;
@@ -42,7 +43,8 @@ public class Main {
     public static void main(String[] args) {
         CommandLine cmdLine = parseCommandLine(args);
         if (cmdLine != null){
-            runAnalysis();
+            //runAnalysis();
+           runPassHigh();
         }
         
     }
@@ -73,6 +75,38 @@ public class Main {
         }
         
         return cmdLine;
+    }
+    
+    private static void runPassHigh(){
+       PositionSortedSignal signal;
+       HighPassFilter passH = new HighPassFilter();
+        try {
+           
+            signal = new PositionSortedSignal(positionsFileName, fstFileName);
+            passH.setSignal(signal);
+                    
+            
+            // Max<cutoff,analysis>
+            Map<Double,Object> resultsByCutOff = new HashMap<Double, Object>();
+            
+            
+            double cutOff = 0.1;
+            while (cutOff < 1){
+               passH.setCufOffFrequency(cutOff);
+               passH.runAnalysis();
+                       
+               cutOff = cutOff + 0.1;
+               
+               System.out.println("cufOff:" + cutOff);
+               System.out.println(passH.getAnalysis());
+            }
+            
+            
+        }catch(FileNotFoundException ex){
+           System.out.print("File not found");
+        }catch(SignalLengthMismatch ex){
+           System.out.println(ex.getMessage());
+        }
     }
     
     private static void runAnalysis(){
