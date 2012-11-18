@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.dmp.signalanalyzer.analyzers;
 
 import com.dmp.signalanalyzer.beans.PositionSortedSignal;
@@ -11,59 +7,72 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- *
- * @author pdemartino <pdemartino@venere.com>
+ * 
+ * @author Pasquale De Martino <paco.dmp@gmail.com>
  */
-public class HighPassFilter implements ISignalAnalyzer{
-   private PositionSortedSignal signal;
-   private Map<Double,Double> analysis;
-   private double cutOff = 0.5;
-   double a = (2 - cutOff) / (2 + cutOff);
-   double b = 2/(2+cutOff);
+public class HighPassFilter {
+	private PositionSortedSignal signal;
+	private Map<Double, Float> analysis;
+	private float cutOff = 0.5f;
+	private float alfa;
+	private float beta; 
 
-   public String getName() {
-      return "HPF";
-   }
-   
-   public void setSignal(PositionSortedSignal signal){
-      this.signal = signal;
-   }
-   
-   public void setCufOffFrequency(double freq){
-      this.cutOff = freq;
-   }
+	public String getName() {
+		return "HPF";
+	}
+	
+	
 
-   public void runAnalysis() {
-      this.analysis = new HashMap<Double, Double>();
-      
-      Iterator<Pulse> pIt = signal.iterator();
-      
-      double preX = -1;
-      double preY = -1;
-      while(pIt.hasNext()){
-         Pulse p = pIt.next();
-         
-         if (preX == -1){
-            preX = p.getValue();
-            preY = preX;
-         }
-         
-         double y = passHighFunction(preY, preX, p.getValue());
-         this.analysis.put(p.getPosition(), y);
-         
-         preX = p.getValue();
-         preY = y;
-      }
-      
-   }
-   
-   private double passHighFunction(double yPre, double pre, double now){
-      double yNow = a*yPre + b * (now + pre);
-      return yNow;
-   }
+	public HighPassFilter() {
+		super();
+		this.setCufOffFrequency(cutOff);
+	}
 
-   public Object getAnalysis() {
-      return this.analysis;
-   }
-   
+
+
+	public void setSignal(PositionSortedSignal signal) {
+		this.signal = signal;
+	}
+
+	public void setCufOffFrequency(float freq) {
+		this.cutOff = freq;
+		alfa = (2 - cutOff) / (2 + cutOff);
+		beta = 2 / (2 + cutOff);
+	}
+
+	public void runAnalysis() {
+		this.analysis = new HashMap<Double, Float>();
+
+		Iterator<Pulse> pIt = signal.iterator();
+
+		float preX = -2f;
+		float preY = -2f;
+		while (pIt.hasNext()) {
+			Pulse p = pIt.next();
+
+			if (preX == -2f) {
+				preX = p.getValue();
+				preY = preX;
+			}
+
+			float y = passHighFunction(preY, preX, p.getValue());
+			System.out.println(String.format("%s:%s", p.getPosition(),y));
+			this.analysis.put(p.getPosition(), y);
+
+			preX = p.getValue();
+			preY = y;
+		}
+
+	}
+
+	private float passHighFunction(float yPre, float pre, float now) {
+		//double yNow = (alfa * yPre) + (beta * (now - pre));
+		float yNow = alfa * (yPre + now - pre);
+		return yNow;
+	}
+
+	public Map<Double,Float> getAnalysis() {
+		return this.analysis;
+	}
+
 }

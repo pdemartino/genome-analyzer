@@ -11,11 +11,16 @@ import com.dmp.signalanalyzer.beans.SlicedSignal;
 import com.dmp.signalanalyzer.exceptions.SignalLengthMismatch;
 import com.dmp.signalanalyzer.utils.CommandLineManager;
 import com.dmp.signalanalyzer.utils.Commands;
+
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.cli.CommandLine;
@@ -66,6 +71,12 @@ public class Main {
                 size = cmdLine.hasOption(Commands.size.name())
                         ? Double.valueOf(cmdLine.getOptionValue(Commands.size.name()))
                         : null;
+                        
+                //Add Checks
+                File outputDirectoryFileHandler = new File(outputDirectory);
+                if (!outputDirectoryFileHandler.isDirectory()){
+                	outputDirectoryFileHandler.mkdirs();
+                }
                 
                 
             }
@@ -84,22 +95,16 @@ public class Main {
            
             signal = new PositionSortedSignal(positionsFileName, fstFileName);
             passH.setSignal(signal);
-                    
             
-            // Max<cutoff,analysis>
-            Map<Double,Object> resultsByCutOff = new HashMap<Double, Object>();
-            
-            
-            double cutOff = 0.1;
-            while (cutOff < 1){
+            float cutOff = 0.1f;
+     //       while (cutOff < 1){
                passH.setCufOffFrequency(cutOff);
                passH.runAnalysis();
-                       
-               cutOff = cutOff + 0.1;
                
-               System.out.println("cufOff:" + cutOff);
-               System.out.println(passH.getAnalysis());
-            }
+               saveToFile(passH.getAnalysis(),String.valueOf(cutOff));
+               
+               cutOff = cutOff + 0.1f;
+           // }
             
             
         }catch(FileNotFoundException ex){
@@ -108,6 +113,28 @@ public class Main {
            System.out.println(ex.getMessage());
         }
     }
+    
+    private static void saveToFile(Map<Double,Float> analysis, String fileName){
+    	try {
+			FileWriter fwr = new FileWriter(outputDirectory + File.separator +  fileName);
+			BufferedWriter bwr = new BufferedWriter(fwr);
+			
+			Iterator<Entry<Double, Float>> it = analysis.entrySet().iterator();
+			while(it.hasNext()){
+				Map.Entry<Double, Float> mapEntry = (Entry<Double, Float>) it.next();
+				
+				bwr.write(mapEntry.getValue().toString());
+				bwr.newLine();
+			}
+			
+			bwr.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    
     
     private static void runAnalysis(){
         PositionSortedSignal signal;
