@@ -19,6 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -114,16 +115,13 @@ public class Main {
         }
     }
     
-    private static void saveToFile(Map<Double,Float> analysis, String fileName){
+    private static void saveToFile(List<Float> analysis, String fileName){
     	try {
 			FileWriter fwr = new FileWriter(outputDirectory + File.separator +  fileName);
 			BufferedWriter bwr = new BufferedWriter(fwr);
 			
-			Iterator<Entry<Double, Float>> it = analysis.entrySet().iterator();
-			while(it.hasNext()){
-				Map.Entry<Double, Float> mapEntry = (Entry<Double, Float>) it.next();
-				
-				bwr.write(mapEntry.getValue().toString());
+			for(Float value : analysis){
+				bwr.write(value.toString());
 				bwr.newLine();
 			}
 			
