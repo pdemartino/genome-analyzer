@@ -7,8 +7,9 @@ package com.dmp.signalanalyzer.utils;
  */
 public enum Commands {
     positions,
-    fst,
+    signal,
     step,
-    size,
-    outputdirectory   
+    window,
+    outputdirectory,
+    analysis
 }

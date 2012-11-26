@@ -50,8 +50,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.dmp.signalanalyzer.Main</mainClass>
-                            <packageName>com.dmp.signalanalyzer</packageName>
+                            <mainClass>com.dmp.signalanalyzer.cli.Main</mainClass>
+                            <packageName>com.dmp.signalanalyzer.cli</packageName>
                         </manifest>
                     </archive>
                 </configuration>
@@ -69,7 +69,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>${artifactId}-${version}-standalone</finalName>
+                    <finalName>${artifactId}-${version}-bundle</finalName>
                 </configuration>
             </plugin>
             
