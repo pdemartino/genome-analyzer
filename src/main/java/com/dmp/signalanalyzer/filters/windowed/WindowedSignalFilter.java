@@ -17,8 +17,9 @@ public abstract class WindowedSignalFilter extends SignalFilter {
       float winValue;
       for (Signal window : windowedSignal.getPulses()){
          winValue = getSingleWindowValue(window);
-         if (Float.isNaN(winValue))
+         if (Float.isNaN(winValue)) {
             winValue = 0f;
+         }
          window.setValue(winValue);
       }
       return windowedSignal;

@@ -11,5 +11,7 @@ public enum Commands {
     step,
     window,
     outputdirectory,
-    analysis
+    analysis,
+    lowmemory;
+
 }

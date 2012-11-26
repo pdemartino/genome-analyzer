@@ -14,4 +14,5 @@ public class SignalAnalyzerConstants {
    public static final float WINDOW_MULT = 1f / 20f;
    public static String CSV_SEPARATOR = ",";
    public static String CSV_EXTENSION = ".csv";
+   public static boolean DEFAULT_BUFFERED_WRITE = false;
 }

@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -98,17 +100,26 @@ public class Signal {
    }
    
    public void writeToFile(String filepath, String separator) throws IOException {
-      FileWriter fwr = new FileWriter(filepath);
-      BufferedWriter bwr = new BufferedWriter(fwr);
-
-      for (Signal p : this.pulses) {
-         bwr.write(String.valueOf(p.getTime()));
-         bwr.write(separator);
-         bwr.write(String.valueOf(p.getValue()));
-         bwr.newLine();
+      this.writeToFile(filepath, separator, SignalAnalyzerConstants.DEFAULT_BUFFERED_WRITE);
+   }
+   
+   public void writeToFile(String filepath, String separator, boolean bufferedWriting) throws IOException {
+      String newLine = "\n";
+      
+      Writer fwr = new FileWriter(filepath);
+      
+      if (bufferedWriting){
+         fwr = new BufferedWriter(fwr);
       }
 
-      bwr.close();
+      for (Signal p : this.pulses) {
+         fwr.write(String.valueOf(p.getTime()));
+         fwr.write(separator);
+         fwr.write(String.valueOf(p.getValue()));
+         fwr.write(newLine);
+      }
+
+      fwr.close();
    }
    
    public void sortByPosition() {

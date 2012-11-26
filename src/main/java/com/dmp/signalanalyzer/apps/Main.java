@@ -71,7 +71,11 @@ public class Main {
       List<String> analysisToPerform =(List<String>) clm.getArguments().get(Commands.analysis.name());
       SignalFilter sa = null;
       Signal outSignal;
-      String outFileName;
+      String outPutDirectory = ((String)clm.getArguments().get(Commands.outputdirectory.name()));
+      if (!outPutDirectory.endsWith(File.separator)){
+         outPutDirectory += File.separator;
+      }
+      String outFilePath;
       for (String analysis : analysisToPerform){
          //[winmean winmedian winmax win90perc lowpass highpass unbias composite]
          if (analysis.equals("winmean")){
@@ -92,11 +96,15 @@ public class Main {
             sa = new CompositeLpHpUnbiasFilter();
          } 
          
-         outFileName = ((String)clm.getArguments().get(Commands.outputdirectory.name()))
-                 + File.separator + sa.getName() + SignalAnalyzerConstants.CSV_EXTENSION;
+         
          outSignal = sa.filter(inputSignal);
-         System.out.println(String.format("Writing %s result into %s ...", sa.getName(),outFileName));
-         outSignal.writeToFile(outFileName, SignalAnalyzerConstants.CSV_SEPARATOR);
+         outFilePath = outPutDirectory + sa.getName() + SignalAnalyzerConstants.CSV_EXTENSION;
+         System.out.println(String.format("Writing %s result into %s ...", sa.getName(), outFilePath));
+         outSignal.writeToFile(outFilePath, SignalAnalyzerConstants.CSV_SEPARATOR);
+         
+         // try to free up some memory calling the garbage collector
+         outSignal = null;
+         System.gc();
       }
 
    }

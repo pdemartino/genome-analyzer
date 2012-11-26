@@ -12,18 +12,21 @@ public class HighPassFilter extends SignalFilter{
    private float beta = 4f;
 
    
-   public Signal filter(Signal signal) {
+   public Signal filter(Signal inputSignal) {
       Signal filteredSignal = new Signal();
 
-      Signal firstItem = signal.get(0);
+      Signal firstItem = inputSignal.get(0);
       Signal previousFiltered = new Signal(firstItem.getTime(), firstItem.getValue());
-      filteredSignal.addPulse(previousFiltered);
+      // I do not have to add first filtered into out signal cause it will be done
+      // on first iteration
       
-      for (int i = 1; i < signal.size(); i++){
+      Signal previousPulse = firstItem;
+      for (Signal pulse : inputSignal.getPulses()){
           float filteredValue = (alpha * previousFiltered.getValue()) +
-                  (beta * (signal.get(i).getValue() - signal.get(i-1).getValue()));
+                  (beta * (pulse.getValue() - previousPulse.getValue()));
           
-          previousFiltered = new Signal(signal.get(i).getTime(), filteredValue);
+          previousPulse = pulse;
+          previousFiltered = new Signal(pulse.getTime(), filteredValue);
           filteredSignal.addPulse(previousFiltered);
       }
       

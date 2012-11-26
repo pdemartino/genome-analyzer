@@ -50,8 +50,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.dmp.signalanalyzer.cli.Main</mainClass>
-                            <packageName>com.dmp.signalanalyzer.cli</packageName>
+                            <mainClass>com.dmp.signalanalyzer.apps.Main</mainClass>
+                            <packageName>com.dmp.signalanalyzer.apps</packageName>
                         </manifest>
                     </archive>
                 </configuration>
