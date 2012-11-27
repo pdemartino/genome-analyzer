@@ -37,11 +37,12 @@ public class Main {
          checkOutputDirectory();
          runAnalysis();
       } catch (ParseException ex) {
-         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+         System.err.println(ex.getMessage());
+         clm.printHelp();
       } catch (IOException ex){
          Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
       } catch (SignalLengthMismatch ex){
-         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+         System.err.println(ex.getMessage());
       }
 
    }
@@ -79,7 +80,7 @@ public class Main {
       for (String analysis : analysisToPerform){
          //[winmean winmedian winmax win90perc lowpass highpass unbias composite]
          if (analysis.equals("winmean")){
-            sa = new WindowedMeanAnalysis();          
+            sa = new WindowedMeanAnalysis();
          }else if (analysis.equals("winmax")){
             sa = new WindowedMaximumAnalysis();
          }else if (analysis.equals("win90perc")){

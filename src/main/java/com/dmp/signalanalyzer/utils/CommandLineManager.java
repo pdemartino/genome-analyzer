@@ -133,6 +133,12 @@ public class CommandLineManager {
               .hasArg()
               .withDescription("Directory where to put analysis files (one for each analysis)")
               .create(Commands.outputdirectory.name()));
+      
+      commandLineOptions.addOption(
+              OptionBuilder.hasArg(false)
+              .isRequired(false)
+              .create(Commands.lowmemory.name())
+              );
 
 
       return commandLineOptions;
