@@ -14,7 +14,7 @@ public class WindowedMeanAnalysis extends WindowedSignalFilter {
 		for (Signal pulse : window.getPulses()){
 			sum += pulse.getValue();
 		}
-		return sum / window.size();
+		return sum / (window.getTStop() - window.getTStart());
 	}
 
 }

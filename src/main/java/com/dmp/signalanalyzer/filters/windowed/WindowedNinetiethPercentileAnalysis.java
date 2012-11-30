@@ -12,11 +12,13 @@ public class WindowedNinetiethPercentileAnalysis extends WindowedSignalFilter {
    private static final double quantile = 90.;
    private static Percentile percentile = new Percentile();
 
-   public float getSingleWindowValue(Signal slice) {
+   public float getSingleWindowValue(Signal window) {
       percentile.setQuantile(quantile);
-      double[] values = slice.toDoubleValuesArray();
-      return (float) percentile.evaluate(values);
+      float percentileVal = (float) percentile.evaluate(window.toDoubleValuesArray());
+      // The more items you consider, the more this value is important
+      percentileVal *= window.size();
+      // The more this window is large, the less this value is important
+      percentileVal /= (window.getTStop() - window.getTStart());
+      return percentileVal;
    }
-
-
 }
