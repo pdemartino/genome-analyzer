@@ -7,9 +7,13 @@ package com.dmp.signalanalyzer.utils;
  */
 public enum Commands {
     positions,
+    positionsColumn,
     signal,
+    signalColumn,
     step,
+    stepMultiplier,
     window,
+    windowMultiplier,
     outputdirectory,
     analysis,
     lowmemory;

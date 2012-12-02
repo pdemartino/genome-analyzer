@@ -1,11 +1,12 @@
 package com.dmp.signalanalyzer.apps;
 
-import com.dmp.signalanalyzer.beans.Signal;
+import com.dmp.signalanalyzer.signal.Signal;
 import com.dmp.signalanalyzer.exceptions.SignalLengthMismatch;
 import com.dmp.signalanalyzer.filters.CompositeLpHpUnbiasFilter;
 import com.dmp.signalanalyzer.filters.HighPassFilter;
 import com.dmp.signalanalyzer.filters.LowPassFilter;
 import com.dmp.signalanalyzer.filters.SignalFilter;
+import com.dmp.signalanalyzer.filters.TopFivePercent;
 import com.dmp.signalanalyzer.filters.UnbiasFilter;
 import com.dmp.signalanalyzer.filters.windowed.WindowedMaximumAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedMeanAnalysis;
@@ -13,6 +14,7 @@ import com.dmp.signalanalyzer.filters.windowed.WindowedMedianAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedNinetiethPercentileAnalysis;
 import com.dmp.signalanalyzer.utils.CommandLineManager;
 import com.dmp.signalanalyzer.utils.Commands;
+import com.dmp.signalanalyzer.utils.InputFilesLoader;
 import com.dmp.signalanalyzer.utils.SignalAnalyzerConstants;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,24 +51,28 @@ public class Main {
 
    private static void runAnalysis() throws FileNotFoundException, SignalLengthMismatch, IOException {
       // Step 1: load signal
-      Signal inputSignal = new Signal();
-      String signalValuesFileName = (String) clm.getArguments().get(Commands.signal.name());
-
-      if (clm.getArguments().containsKey(Commands.positions.name())) {
-         String positionsFileName = (String) clm.getArguments().get(Commands.positions.name());
-         inputSignal.loadPulsesFromFile(positionsFileName, signalValuesFileName);
-      }
-
+      Signal inputSignal = loadInputSignal();
+      
+    
       // Step 2: compute step and window for windowed analysis
-      float step = inputSignal.getTStart() * SignalAnalyzerConstants.STEP_MULT;
-      float window = inputSignal.getTStop() * SignalAnalyzerConstants.WINDOW_MULT;
-      // override with user preferences
-      if (clm.getArguments().containsKey(Commands.step.name())) {
-         step = ((Float) clm.getArguments().get(Commands.step.name())).floatValue();
-      }
-      if (clm.getArguments().containsKey(Commands.window.name())) {
-         window = ((Float) clm.getArguments().get(Commands.window.name())).floatValue();
-      }
+      float windowMultiplier = clm.getArguments().containsKey(Commands.windowMultiplier.name()) 
+              ? ((Float) clm.getArguments().get(Commands.windowMultiplier.name())).floatValue() 
+              : SignalAnalyzerConstants.WINDOW_MULT;
+      
+      float window = clm.getArguments().containsKey(Commands.window.name())
+              ? ((Float) clm.getArguments().get(Commands.window.name())).floatValue()
+              : inputSignal.getTStop() * windowMultiplier;
+      
+      float stepMultiplier = clm.getArguments().containsKey(Commands.stepMultiplier.name()) 
+              ? ((Float) clm.getArguments().get(Commands.stepMultiplier.name())).floatValue() 
+              : SignalAnalyzerConstants.STEP_MULT;
+      
+      float step = clm.getArguments().containsKey(Commands.step.name())
+              ? ((Float) clm.getArguments().get(Commands.step.name())).floatValue()
+              : window * stepMultiplier;
+     
+      System.out.println(String.format("Windowed Analysis [window size: %s loci, step: %s loci]", window,step));
+      
 
       // Step 3: start analysing signal
       List<String> analysisToPerform =(List<String>) clm.getArguments().get(Commands.analysis.name());
@@ -95,11 +101,18 @@ public class Main {
             sa = new WindowedMedianAnalysis();
          }else if (analysis.equals("composite")){
             sa = new CompositeLpHpUnbiasFilter();
+         }else{
+             continue; // skip wrong requests
          } 
          
          
          outSignal = sa.filter(inputSignal);
          outFilePath = outPutDirectory + sa.getName() + SignalAnalyzerConstants.CSV_EXTENSION;
+         System.out.println(String.format("Writing %s result into %s ...", sa.getName(), outFilePath));
+         outSignal.writeToFile(outFilePath, SignalAnalyzerConstants.CSV_SEPARATOR);
+         // Select TopFivePercent
+         outSignal = TopFivePercent.staticFilter(outSignal);
+         outFilePath = outPutDirectory + sa.getName() + "-Top5Percent" +SignalAnalyzerConstants.CSV_EXTENSION;
          System.out.println(String.format("Writing %s result into %s ...", sa.getName(), outFilePath));
          outSignal.writeToFile(outFilePath, SignalAnalyzerConstants.CSV_SEPARATOR);
          
@@ -108,6 +121,25 @@ public class Main {
          System.gc();
       }
 
+   }
+   
+   private static Signal loadInputSignal() throws FileNotFoundException, IOException, SignalLengthMismatch{
+      Signal inputSignal = new Signal();
+      
+      String signalValuesFileName = (String) clm.getArguments().get(Commands.signal.name());
+      Integer signalValuesColumn = (Integer) clm.getArguments().get(Commands.signalColumn.name());
+      float[] signalArray = InputFilesLoader.csvToFloatArray(signalValuesFileName, signalValuesColumn.intValue(), SignalAnalyzerConstants.INPUT_CSV_SEPARATOR);
+      
+
+      if (clm.getArguments().containsKey(Commands.positions.name())) {
+         String positionsFileName = (String) clm.getArguments().get(Commands.positions.name());
+         Integer positionsColumn = (Integer) clm.getArguments().get(Commands.positionsColumn.name());
+         inputSignal.addPulsesArray(signalArray, InputFilesLoader.csvToFloatArray(positionsFileName, positionsColumn, SignalAnalyzerConstants.INPUT_CSV_SEPARATOR));
+      }else{
+         inputSignal.addPulsesArray(signalArray);
+      }
+      
+      return inputSignal;
    }
 
     private static void checkOutputDirectory() {

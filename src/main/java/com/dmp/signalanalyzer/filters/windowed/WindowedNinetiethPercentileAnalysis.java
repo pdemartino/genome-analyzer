@@ -1,6 +1,6 @@
 package com.dmp.signalanalyzer.filters.windowed;
 
-import com.dmp.signalanalyzer.beans.Signal;
+import com.dmp.signalanalyzer.signal.Signal;
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 
 /**

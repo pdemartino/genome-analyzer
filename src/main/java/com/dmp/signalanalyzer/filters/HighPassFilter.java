@@ -1,6 +1,6 @@
 package com.dmp.signalanalyzer.filters;
 
-import com.dmp.signalanalyzer.beans.Signal;
+import com.dmp.signalanalyzer.signal.Signal;
 
 /**
  *
