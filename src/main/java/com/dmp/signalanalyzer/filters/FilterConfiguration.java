@@ -14,14 +14,14 @@ public class FilterConfiguration {
         this.configurationParameters = new HashMap<String, Object>();
     }
     
-    public void defineParameter(String parameterName, Object defaultValue){
-        this.configurationParameters.put(parameterName, defaultValue);
-    }
+//    public void defineParameter(String parameterName, Object defaultValue){
+//        this.configurationParameters.put(parameterName, defaultValue);
+//    }
     
     public void set(String parameterName, Object value){
-        if (configurationParameters.containsKey(parameterName)){
+        //if (configurationParameters.containsKey(parameterName)){
             this.configurationParameters.put(parameterName, value);
-        }
+        //}
     }
     
     public Object get(String parameterName){

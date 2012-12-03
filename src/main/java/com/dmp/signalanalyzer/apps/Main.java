@@ -3,6 +3,7 @@ package com.dmp.signalanalyzer.apps;
 import com.dmp.signalanalyzer.signal.Signal;
 import com.dmp.signalanalyzer.exceptions.SignalLengthMismatch;
 import com.dmp.signalanalyzer.filters.CompositeLpHpUnbiasFilter;
+import com.dmp.signalanalyzer.filters.FilterConfiguration;
 import com.dmp.signalanalyzer.filters.HighPassFilter;
 import com.dmp.signalanalyzer.filters.LowPassFilter;
 import com.dmp.signalanalyzer.filters.SignalFilter;
@@ -53,7 +54,7 @@ public class Main {
       // Step 1: load signal
       Signal inputSignal = loadInputSignal();
       
-    
+      
       // Step 2: compute step and window for windowed analysis
       float windowMultiplier = clm.getArguments().containsKey(Commands.windowMultiplier.name()) 
               ? ((Float) clm.getArguments().get(Commands.windowMultiplier.name())).floatValue() 
@@ -70,8 +71,16 @@ public class Main {
       float step = clm.getArguments().containsKey(Commands.step.name())
               ? ((Float) clm.getArguments().get(Commands.step.name())).floatValue()
               : window * stepMultiplier;
+      
+      
+      FilterConfiguration filterConfiguration = new FilterConfiguration();
+      filterConfiguration.set("window", new Float(window));
+      filterConfiguration.set("step", new Float(step));
+      
      
-      System.out.println(String.format("Windowed Analysis [window size: %s loci, step: %s loci]", window,step));
+      System.out.println(String.format("Windowed Analysis [window size: %s loci, step: %s loci]", 
+              filterConfiguration.get("window"),
+              filterConfiguration.get("step")));
       
 
       // Step 3: start analysing signal
@@ -105,7 +114,7 @@ public class Main {
              continue; // skip wrong requests
          } 
          
-         
+         sa.setFilterConfiguration(filterConfiguration);
          outSignal = sa.filter(inputSignal);
          outFilePath = outPutDirectory + sa.getName() + SignalAnalyzerConstants.CSV_EXTENSION;
          System.out.println(String.format("Writing %s result into %s ...", sa.getName(), outFilePath));
@@ -125,6 +134,14 @@ public class Main {
    
    private static Signal loadInputSignal() throws FileNotFoundException, IOException, SignalLengthMismatch{
       Signal inputSignal = new Signal();
+      
+      if (clm.getArguments().containsKey(Commands.lowerBound.name())){
+          inputSignal.setLowerBound(((Float)clm.getArguments().get(Commands.lowerBound.name())).floatValue());
+      }
+      
+      if (clm.getArguments().containsKey(Commands.upperBound.name())){
+          inputSignal.setUpperBound(((Float)clm.getArguments().get(Commands.upperBound.name())).floatValue());
+      }
       
       String signalValuesFileName = (String) clm.getArguments().get(Commands.signal.name());
       Integer signalValuesColumn = (Integer) clm.getArguments().get(Commands.signalColumn.name());

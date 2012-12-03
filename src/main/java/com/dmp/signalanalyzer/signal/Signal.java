@@ -22,6 +22,7 @@ import java.util.Scanner;
  */
 public class Signal {
 
+    private float lowerBound = Float.MIN_VALUE, upperBound = Float.MAX_VALUE;
     private Float tStart = null, tStop = null;
     private Float value = null;
     private List<Signal> pulses;
@@ -59,16 +60,17 @@ public class Signal {
     }
 
     public boolean addPulse(Signal pulse) {
+        if ((pulse.getTime() >= lowerBound) && (pulse.getTime() <= upperBound)){
+            if (this.pulses.add(pulse)) {
+                if ((this.tStart == null) || (this.tStart > pulse.getTStart())) {
+                    this.tStart = pulse.getTStart();
+                }
 
-        if (this.pulses.add(pulse)) {
-            if ((this.tStart == null) || (this.tStart > pulse.getTStart())) {
-                this.tStart = pulse.getTStart();
+                if ((this.tStop == null) || (this.tStop < pulse.getTStop())) {
+                    this.tStop = pulse.getTStop();
+                }
+                return true;
             }
-
-            if ((this.tStop == null) || (this.tStop < pulse.getTStop())) {
-                this.tStop = pulse.getTStop();
-            }
-            return true;
         }
         return false;
     }
@@ -127,12 +129,24 @@ public class Signal {
         if (bufferedWriting) {
             fwr = new BufferedWriter(fwr);
         }
+        
+        // Print Header
+        fwr.write("WindowID");
+        fwr.write(separator + "Size");
+        fwr.write(separator + "Start_Position");
+        fwr.write(separator + "Stop_Position");
+        fwr.write(separator + "Center");
+        fwr.write(separator + "Value");
 
+        int i = 0;
         for (Signal p : this.pulses) {
-            fwr.write(String.valueOf(p.getTime()));
-            fwr.write(separator);
-            fwr.write(String.valueOf(p.getValue()));
             fwr.write(newLine);
+            fwr.write(String.valueOf(++i));
+            fwr.write(separator + String.valueOf(p.getTStop() - p.getTStart()));
+            fwr.write(separator + String.valueOf(p.getTStart()));
+            fwr.write(separator + String.valueOf(p.getTStop()));
+            fwr.write(separator + String.valueOf(p.getTime()));
+            fwr.write(separator + String.valueOf(p.getValue()));
         }
 
         fwr.close();
@@ -177,6 +191,16 @@ public class Signal {
             return 0f;
         }
     }
+
+    public void setLowerBound(float lowerBound) {
+        this.lowerBound = lowerBound;
+    }
+
+    public void setUpperBound(float upperBound) {
+        this.upperBound = upperBound;
+    }
+    
+    
 
     public Signal get(int i) {
         return this.pulses.get(i);

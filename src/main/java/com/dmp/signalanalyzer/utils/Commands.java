@@ -16,6 +16,8 @@ public enum Commands {
     windowMultiplier,
     outputdirectory,
     analysis,
-    lowmemory;
+    lowmemory,
+    lowerBound,
+    upperBound;
 
 }

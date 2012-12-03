@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
@@ -78,17 +77,17 @@ public class CommandLineManager {
       }
 
       if (cmLine.hasOption(Commands.step.name())) {
-         arguments.put(Commands.step.name(), Double.valueOf(cmLine.getOptionValue(Commands.step.name())));
+         arguments.put(Commands.step.name(), Float.valueOf(cmLine.getOptionValue(Commands.step.name())));
       }
       if (cmLine.hasOption(Commands.stepMultiplier.name())) {
-         arguments.put(Commands.stepMultiplier.name(), Double.valueOf(cmLine.getOptionValue(Commands.stepMultiplier.name())));
+         arguments.put(Commands.stepMultiplier.name(), Float.valueOf(cmLine.getOptionValue(Commands.stepMultiplier.name())));
       }
 
       if (cmLine.hasOption(Commands.window.name())) {
-         arguments.put(Commands.window.name(), Double.valueOf(cmLine.getOptionValue(Commands.window.name())));
+         arguments.put(Commands.window.name(), Float.valueOf(cmLine.getOptionValue(Commands.window.name())));
       }
       if (cmLine.hasOption(Commands.windowMultiplier.name())) {
-         arguments.put(Commands.windowMultiplier.name(), Double.valueOf(cmLine.getOptionValue(Commands.windowMultiplier.name())));
+         arguments.put(Commands.windowMultiplier.name(), Float.valueOf(cmLine.getOptionValue(Commands.windowMultiplier.name())));
       }
 
       // analysis
@@ -99,7 +98,12 @@ public class CommandLineManager {
       }
       arguments.put(Commands.analysis.name(), anList);
 
-
+      if (cmLine.hasOption(Commands.lowerBound.name())) {
+         arguments.put(Commands.lowerBound.name(), Float.valueOf(cmLine.getOptionValue(Commands.lowerBound.name())));
+      }
+      if (cmLine.hasOption(Commands.upperBound.name())) {
+         arguments.put(Commands.upperBound.name(), Float.valueOf(cmLine.getOptionValue(Commands.upperBound.name())));
+      }
 
 
    }
@@ -187,6 +191,18 @@ public class CommandLineManager {
               OptionBuilder.hasArg(false)
               .isRequired(false)
               .create(Commands.lowmemory.name()));
+      
+      commandLineOptions.addOption(
+              OptionBuilder.hasArg(true)
+              .withDescription("Consider only values with time/position >= lowerBound")
+              .isRequired(false)
+              .create(Commands.lowerBound.name()));
+
+      commandLineOptions.addOption(
+              OptionBuilder.hasArg(true)
+              .withDescription("Consider only values with time/position <= lowerBound")
+              .isRequired(false)
+              .create(Commands.upperBound.name()));
 
 
       return commandLineOptions;

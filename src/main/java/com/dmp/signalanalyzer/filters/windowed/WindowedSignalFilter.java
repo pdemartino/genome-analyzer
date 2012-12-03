@@ -10,9 +10,6 @@ import com.dmp.signalanalyzer.utils.SignalAnalyzerConstants;
  * @author Pasquale De Martino <paco.dmp@gmail.com>
  */
 public abstract class WindowedSignalFilter extends SignalFilter {
-   private float stepSize = -1f, windowSize = -1f;
-    
-  
    public Signal filter(Signal inputSignal) {
       Signal windowedSignal = generateWindowedSignal(inputSignal);
       float winValue;
@@ -25,14 +22,18 @@ public abstract class WindowedSignalFilter extends SignalFilter {
       }
       return windowedSignal;
    }
+   
+   
 
    private Signal generateWindowedSignal(Signal inputSignal) {
       Signal windowedSignal = new Signal();
     
-      float winSize = this.windowSize > 0 ? this.windowSize 
+      float winSize = filterConfiguration.get("window")!=null 
+              ? ((Float)filterConfiguration.get("window")).floatValue()
               : (inputSignal.getTStop() + inputSignal.getTStart()) / 2 * SignalAnalyzerConstants.WINDOW_MULT;
      
-      float stSize = this.stepSize > 0 ? this.stepSize 
+      float stSize = filterConfiguration.get("step")!=null 
+              ? ((Float)filterConfiguration.get("step")).floatValue()
               : winSize * SignalAnalyzerConstants.STEP_MULT;
       
       // Create Windows
