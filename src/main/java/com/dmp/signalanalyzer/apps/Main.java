@@ -1,22 +1,23 @@
 package com.dmp.signalanalyzer.apps;
 
-import com.dmp.signalanalyzer.signal.Signal;
+import com.dmp.signalanalyzer.configuration.ConfigurationManager;
 import com.dmp.signalanalyzer.exceptions.SignalLengthMismatch;
 import com.dmp.signalanalyzer.filters.CompositeLpHpUnbiasFilter;
+import com.dmp.signalanalyzer.filters.CompositePositionAdapted;
 import com.dmp.signalanalyzer.filters.FilterConfiguration;
 import com.dmp.signalanalyzer.filters.HighPassFilter;
 import com.dmp.signalanalyzer.filters.LowPassFilter;
+import com.dmp.signalanalyzer.filters.PositionAdaptedFilter;
 import com.dmp.signalanalyzer.filters.SignalFilter;
-import com.dmp.signalanalyzer.filters.TopFivePercent;
 import com.dmp.signalanalyzer.filters.UnbiasFilter;
 import com.dmp.signalanalyzer.filters.windowed.WindowedMaximumAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedMeanAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedMedianAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedNinetiethPercentileAnalysis;
+import com.dmp.signalanalyzer.signal.Signal;
 import com.dmp.signalanalyzer.utils.CommandLineManager;
 import com.dmp.signalanalyzer.utils.Commands;
 import com.dmp.signalanalyzer.utils.InputFilesLoader;
-import com.dmp.signalanalyzer.utils.SignalAnalyzerConstants;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,9 +33,11 @@ import org.apache.commons.cli.ParseException;
 public class Main {
 
    static CommandLineManager clm;
+   static ConfigurationManager configurationManager;
 
    public static void main(String[] args) {
       clm = CommandLineManager.getInstance();
+      configurationManager = ConfigurationManager.getInstance();
       try {
          clm.parseCommandLine(args);
          checkOutputDirectory();
@@ -58,7 +61,7 @@ public class Main {
       // Step 2: compute step and window for windowed analysis
       float windowMultiplier = clm.getArguments().containsKey(Commands.windowMultiplier.name()) 
               ? ((Float) clm.getArguments().get(Commands.windowMultiplier.name())).floatValue() 
-              : SignalAnalyzerConstants.WINDOW_MULT;
+              : configurationManager.getWindowsMultiplier();
       
       float window = clm.getArguments().containsKey(Commands.window.name())
               ? ((Float) clm.getArguments().get(Commands.window.name())).floatValue()
@@ -66,7 +69,7 @@ public class Main {
       
       float stepMultiplier = clm.getArguments().containsKey(Commands.stepMultiplier.name()) 
               ? ((Float) clm.getArguments().get(Commands.stepMultiplier.name())).floatValue() 
-              : SignalAnalyzerConstants.STEP_MULT;
+              : configurationManager.getStepMultiplier();
       
       float step = clm.getArguments().containsKey(Commands.step.name())
               ? ((Float) clm.getArguments().get(Commands.step.name())).floatValue()
@@ -110,20 +113,25 @@ public class Main {
             sa = new WindowedMedianAnalysis();
          }else if (analysis.equals("composite")){
             sa = new CompositeLpHpUnbiasFilter();
-         }else{
+         }else if (analysis.equals("positionAdapted")){
+            sa = new PositionAdaptedFilter();
+         }else if (analysis.equals("positionAdaptedComposite")){
+            sa = new CompositePositionAdapted();
+         }
+         else {
              continue; // skip wrong requests
          } 
          
          sa.setFilterConfiguration(filterConfiguration);
          outSignal = sa.filter(inputSignal);
-         outFilePath = outPutDirectory + sa.getName() + SignalAnalyzerConstants.CSV_EXTENSION;
+         outFilePath = outPutDirectory + sa.getName() + configurationManager.getOutputFileExtension();
          System.out.println(String.format("Writing %s result into %s ...", sa.getName(), outFilePath));
-         outSignal.writeToFile(outFilePath, SignalAnalyzerConstants.CSV_SEPARATOR);
+         outSignal.writeToFile(outFilePath, configurationManager.getOutputFileSeparatorChar());
          // Select TopFivePercent
-         outSignal = TopFivePercent.staticFilter(outSignal);
-         outFilePath = outPutDirectory + sa.getName() + "-Top5Percent" +SignalAnalyzerConstants.CSV_EXTENSION;
-         System.out.println(String.format("Writing %s result into %s ...", sa.getName(), outFilePath));
-         outSignal.writeToFile(outFilePath, SignalAnalyzerConstants.CSV_SEPARATOR);
+         //outSignal = TopFivePercent.staticFilter(outSignal);
+         //outFilePath = outPutDirectory + sa.getName() + "-Top5Percent" +SignalAnalyzerConstants.CSV_EXTENSION;
+         //System.out.println(String.format("Writing %s result into %s ...", sa.getName(), outFilePath));
+         //outSignal.writeToFile(outFilePath, SignalAnalyzerConstants.CSV_SEPARATOR);
          
          // try to free up some memory calling the garbage collector
          outSignal = null;
@@ -145,13 +153,13 @@ public class Main {
       
       String signalValuesFileName = (String) clm.getArguments().get(Commands.signal.name());
       Integer signalValuesColumn = (Integer) clm.getArguments().get(Commands.signalColumn.name());
-      float[] signalArray = InputFilesLoader.csvToFloatArray(signalValuesFileName, signalValuesColumn.intValue(), SignalAnalyzerConstants.INPUT_CSV_SEPARATOR);
+      float[] signalArray = InputFilesLoader.csvToFloatArray(signalValuesFileName, signalValuesColumn.intValue(), configurationManager.getInputFileSeparatorChar());
       
 
       if (clm.getArguments().containsKey(Commands.positions.name())) {
          String positionsFileName = (String) clm.getArguments().get(Commands.positions.name());
          Integer positionsColumn = (Integer) clm.getArguments().get(Commands.positionsColumn.name());
-         inputSignal.addPulsesArray(signalArray, InputFilesLoader.csvToFloatArray(positionsFileName, positionsColumn, SignalAnalyzerConstants.INPUT_CSV_SEPARATOR));
+         inputSignal.addPulsesArray(signalArray, InputFilesLoader.csvToFloatArray(positionsFileName, positionsColumn, configurationManager.getInputFileSeparatorChar()));
       }else{
          inputSignal.addPulsesArray(signalArray);
       }

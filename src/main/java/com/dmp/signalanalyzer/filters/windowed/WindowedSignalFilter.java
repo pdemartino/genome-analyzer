@@ -1,9 +1,8 @@
 package com.dmp.signalanalyzer.filters.windowed;
 
-import com.dmp.signalanalyzer.signal.Signal;
-import com.dmp.signalanalyzer.filters.FilterConfiguration;
+import com.dmp.signalanalyzer.configuration.ConfigurationManager;
 import com.dmp.signalanalyzer.filters.SignalFilter;
-import com.dmp.signalanalyzer.utils.SignalAnalyzerConstants;
+import com.dmp.signalanalyzer.signal.Signal;
 
 /**
  *
@@ -26,15 +25,16 @@ public abstract class WindowedSignalFilter extends SignalFilter {
    
 
    private Signal generateWindowedSignal(Signal inputSignal) {
+      ConfigurationManager configurationManager = ConfigurationManager.getInstance();
       Signal windowedSignal = new Signal();
     
       float winSize = filterConfiguration.get("window")!=null 
               ? ((Float)filterConfiguration.get("window")).floatValue()
-              : (inputSignal.getTStop() + inputSignal.getTStart()) / 2 * SignalAnalyzerConstants.WINDOW_MULT;
+              : (inputSignal.getTStop() + inputSignal.getTStart()) / 2 * configurationManager.getWindowsMultiplier();
      
       float stSize = filterConfiguration.get("step")!=null 
               ? ((Float)filterConfiguration.get("step")).floatValue()
-              : winSize * SignalAnalyzerConstants.STEP_MULT;
+              : winSize * configurationManager.getStepMultiplier();
       
       // Create Windows
       float start = inputSignal.getTStart();

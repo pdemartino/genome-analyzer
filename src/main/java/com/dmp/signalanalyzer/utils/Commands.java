@@ -19,5 +19,4 @@ public enum Commands {
     lowmemory,
     lowerBound,
     upperBound;
-
 }

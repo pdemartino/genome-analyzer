@@ -1,5 +1,6 @@
 package com.dmp.signalanalyzer.utils;
 
+import com.dmp.signalanalyzer.configuration.ConfigurationManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -115,7 +116,7 @@ public class CommandLineManager {
 
    private static Options buildOptions() {
       Options commandLineOptions = new Options();
-
+      ConfigurationManager configurationManager = ConfigurationManager.getInstance();
       commandLineOptions.addOption(
               OptionBuilder
               .hasArg()
@@ -134,7 +135,7 @@ public class CommandLineManager {
       commandLineOptions.addOption(
               OptionBuilder.withArgName("analysis")
               .hasArgs(1)
-              .hasOptionalArgs(SignalAnalyzerConstants.NUM_ANALYSIS - 1)
+              .hasOptionalArgs( - 1)
               .isRequired(true)
               .withDescription("Analysis and filters to apply on signal [winmean winmedian winmax win90perc lowpass highpass unbias composite]"
               + "\nwinmean: windowed filter using window average value"
