@@ -1,23 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.dmp.signalanalyzer.configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 /**
  *
- * @author Paco
+ * @author Pasquale De Martino <paco.dmp@gmail.com>
  */
 public class PropertiesManager {
-
-   private static final String propertyPrefix = "com.dmp.signalanalyzer";
+   protected Logger logger = Logger.getLogger(getClass().getName());
+   private static final String propertyPrefix = "com.dmp.signalanalyzer.";
    private static final String propertiesFile = "signal-analyzer.properties";
    private static PropertiesManager singletonInstance = null;
 
@@ -42,6 +37,7 @@ public class PropertiesManager {
     */
    private void loadProperties() {
       try {
+         
          // load default properties from file
          Properties defaultProperties = new Properties();
          InputStream defaultPropertiesStream = this.getClass().getClassLoader().getResourceAsStream(propertiesFile);
@@ -57,7 +53,7 @@ public class PropertiesManager {
             }
          }
       } catch (IOException ex) {
-         Logger.getLogger(PropertiesManager.class.getName()).log(Level.SEVERE, null, ex);
+         logger.error(ex.getMessage());
       }
    }
 }

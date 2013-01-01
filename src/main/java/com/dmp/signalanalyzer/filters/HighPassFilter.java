@@ -15,13 +15,13 @@ public class HighPassFilter extends SignalFilter{
    public Signal filter(Signal inputSignal) {
       Signal filteredSignal = new Signal();
 
-      Signal firstItem = inputSignal.get(0);
+      Signal firstItem = inputSignal.firstEntry();
       Signal previousFiltered = new Signal(firstItem.getTime(), firstItem.getValue());
       // I do not have to add first filtered into out signal cause it will be done
       // on first iteration
       
       Signal previousPulse = firstItem;
-      for (Signal pulse : inputSignal.getPulses()){
+      for (Signal pulse : inputSignal){
           float filteredValue = (alpha * previousFiltered.getValue()) +
                   (beta * (pulse.getValue() - previousPulse.getValue()));
           

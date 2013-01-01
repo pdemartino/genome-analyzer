@@ -12,7 +12,7 @@ public class UnbiasFilter extends SignalFilter {
         Signal analysis = new Signal();
         float prevAvg = 0;
         int index = 0;
-        for (Signal pulse : inputSignal.getPulses()) {
+        for (Signal pulse : inputSignal) {
             prevAvg = moovingAverage(prevAvg, index, pulse.getValue());
             analysis.addPulse(new Signal(pulse.getTime(), 
                     pulse.getValue() - prevAvg));

@@ -12,7 +12,7 @@ public abstract class WindowedSignalFilter extends SignalFilter {
    public Signal filter(Signal inputSignal) {
       Signal windowedSignal = generateWindowedSignal(inputSignal);
       float winValue;
-      for (Signal window : windowedSignal.getPulses()){
+      for (Signal window : windowedSignal){
          winValue = getSingleWindowValue(window);
          if (Float.isNaN(winValue)) {
             winValue = 0f;
@@ -28,17 +28,17 @@ public abstract class WindowedSignalFilter extends SignalFilter {
       ConfigurationManager configurationManager = ConfigurationManager.getInstance();
       Signal windowedSignal = new Signal();
     
-      float winSize = filterConfiguration.get("window")!=null 
-              ? ((Float)filterConfiguration.get("window")).floatValue()
-              : (inputSignal.getTStop() + inputSignal.getTStart()) / 2 * configurationManager.getWindowsMultiplier();
+      int winSize = filterConfiguration.get("window")!=null 
+              ? ((Integer)filterConfiguration.get("window")).intValue()
+              : (int)((inputSignal.getTStop() + inputSignal.getTStart()) / 2 * configurationManager.getWindowsMultiplier());
      
-      float stSize = filterConfiguration.get("step")!=null 
-              ? ((Float)filterConfiguration.get("step")).floatValue()
-              : winSize * configurationManager.getStepMultiplier();
+      int stSize = filterConfiguration.get("step")!=null 
+              ? ((Integer)filterConfiguration.get("step")).intValue()
+              : (int) (winSize * configurationManager.getStepMultiplier());
       
       // Create Windows
-      float start = inputSignal.getTStart();
-      float stop;
+      int start = inputSignal.getTStart();
+      int stop;
       while (start <= inputSignal.getTStop()) {
          stop = Math.min(start + winSize, inputSignal.getTStop());
          Signal window = new Signal(start, stop, 0f);
@@ -48,9 +48,9 @@ public abstract class WindowedSignalFilter extends SignalFilter {
 
       // Fill Windows
       boolean inserted;
-      for (Signal pulse : inputSignal.getPulses()) {
+      for (Signal pulse : inputSignal) {
          inserted = false;
-         for (Signal window : windowedSignal.getPulses()) {
+         for (Signal window : windowedSignal) {
             inserted = window.addPulseIfCanContain(pulse);
             if (inserted) {
                break;

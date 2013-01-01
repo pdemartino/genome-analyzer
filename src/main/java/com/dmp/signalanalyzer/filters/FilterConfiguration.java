@@ -30,4 +30,14 @@ public class FilterConfiguration {
         }
         return null;
     }
+    
+   @Override
+    public String toString(){
+       String outString = "[";
+       for (Map.Entry<String,Object> parameter : configurationParameters.entrySet()){
+          outString += String.format("%s=%s;", parameter.getKey(), parameter.getValue());
+       }
+       outString += "]";
+       return outString;
+    }
 }

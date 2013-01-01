@@ -11,7 +11,7 @@ public class WindowedMaximumAnalysis extends WindowedSignalFilter {
    public float getSingleWindowValue(Signal window) {
       float maximum = 0f;
 
-      for (Signal pulse : window.getPulses()){
+      for (Signal pulse : window){
          if (pulse.getValue() > maximum) {
             maximum = pulse.getValue();
          }

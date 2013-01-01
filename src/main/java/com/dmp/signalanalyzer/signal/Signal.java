@@ -1,40 +1,36 @@
 package com.dmp.signalanalyzer.signal;
 
-import com.dmp.signalanalyzer.configuration.ConfigurationManager;
 import com.dmp.signalanalyzer.exceptions.SignalLengthMismatch;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Pasquale De Martino <paco.dmp@gmail.com>
  */
-public class Signal {
+public class Signal implements Iterable<Signal> {
 
-   private float lowerBound = Float.MIN_VALUE, upperBound = Float.MAX_VALUE;
-   private Float tStart = null, tStop = null;
+   private Logger logger = Logger.getLogger(Signal.class.getName());
+   private int lowerBound = -1 * Integer.MAX_VALUE, upperBound = Integer.MAX_VALUE;
+   private Integer tStart = null, tStop = null;
    private Float value = null;
-   // Use a map to index using time
-   private Map<Float, Signal> pulses;
+   private int size = 0;
+   // Using a TreeMap to automatically keep items ordered by time (the key value)
+   private TreeMap<Integer, Signal> pulses;
 
-   public Signal(float tStart, float tStop, float value) {
-      this.reset();
+   public Signal(int tStart, int tStop, float value) {
+      this();
       this.tStart = tStart;
       this.tStop = tStop;
       this.value = value;
    }
 
-   public Signal(float time, float value) {
+   public Signal(int time, float value) {
       this(time, time, value);
    }
 
@@ -42,7 +38,7 @@ public class Signal {
       this.reset();
    }
 
-   public void addPulsesArray(float[] signal, float[] positions) throws SignalLengthMismatch {
+   public void addPulsesArray(float[] signal, int[] positions) throws SignalLengthMismatch {
       int len = signal.length;
       if (len == positions.length) {
          for (int i = 0; i < len; i++) {
@@ -55,21 +51,26 @@ public class Signal {
 
    public void addPulsesArray(float[] signal) {
       for (int i = 0; i < signal.length; i++) {
-         this.addPulse(new Signal(signal[i], i));
+         this.addPulse(new Signal(i, signal[i]));
       }
    }
 
    public boolean addPulse(Signal pulse) {
       if ((pulse.getTime() >= lowerBound) && (pulse.getTime() <= upperBound)) {
-         this.pulses.put(Float.valueOf(pulse.getTime()), pulse);
-         if ((this.tStart == null) || (this.tStart > pulse.getTStart())) {
-            this.tStart = pulse.getTStart();
-         }
+         if (this.pulses.get(pulse.getTime()) != null) {
+            logger.warn(String.format("Pulse at time %s already existing into Signal!", pulse.getTime()));
+         } else {
+            this.pulses.put(Integer.valueOf(pulse.getTime()), pulse);
+            this.size++;
+            if ((this.tStart == null) || (this.tStart > pulse.getTStart())) {
+               this.tStart = pulse.getTStart();
+            }
 
-         if ((this.tStop == null) || (this.tStop < pulse.getTStop())) {
-            this.tStop = pulse.getTStop();
+            if ((this.tStop == null) || (this.tStop < pulse.getTStop())) {
+               this.tStop = pulse.getTStop();
+            }
+            return true;
          }
-         return true;
       }
       return false;
    }
@@ -86,68 +87,27 @@ public class Signal {
    public void reset() {
       this.tStart = null;
       this.tStop = null;
-      this.pulses = new HashMap<Float, Signal>();
-   }
-
-   public void writeToFile(String filepath, char separator) throws IOException {
-      ConfigurationManager configurationManager = ConfigurationManager.getInstance();
-      this.writeToFile(filepath, separator, configurationManager.isBufferedReaderAsDefault());
-   }
-
-   public void writeToFile(String filepath, char separator, boolean bufferedWriting) throws IOException {
-      String newLine = "\n";
-
-      Writer fwr = new FileWriter(filepath);
-
-      if (bufferedWriting) {
-         fwr = new BufferedWriter(fwr);
-      }
-
-      // Print Header
-      fwr.write("WindowID");
-      fwr.write(separator + "Size");
-      fwr.write(separator + "Start_Position");
-      fwr.write(separator + "Stop_Position");
-      fwr.write(separator + "Center");
-      fwr.write(separator + "Value");
-
-      int i = 0;
-      for (Signal p : this.pulses) {
-         fwr.write(newLine);
-         fwr.write(String.valueOf(++i));
-         fwr.write(separator + String.valueOf(p.getTStop() - p.getTStart()));
-         fwr.write(separator + String.valueOf(p.getTStart()));
-         fwr.write(separator + String.valueOf(p.getTStop()));
-         fwr.write(separator + String.valueOf(p.getTime()));
-         fwr.write(separator + String.valueOf(p.getValue()));
-      }
-
-      fwr.close();
+      this.pulses = new TreeMap<Integer, Signal>();
    }
 
    public Signal intersect(Signal secondOne) {
       Signal intersectSignal = new Signal();
 
-      for (Signal pulse : this.getPulses()) {
-         float time = pulse.getTime();
-         float myValue = pulse.getValue();
-         secondOne.
-       
+      for (Signal pulse : this) {
+         int time = pulse.getTime();
+         Signal otherPulse = secondOne.get(time);
+         if (otherPulse != null) {
+            float value = Math.min(pulse.getValue(), otherPulse.getValue());
+            intersectSignal.addPulse(new Signal(time, time, value));
+         }
       }
-   }
-
-   public void sortByPosition() {r
-      // sort pulses
-      for (Signal p : this.pulses) {
-         p.sortByPosition();
-      }
-      Collections.sort(this.pulses, new Signal.SignalComparatorByPosition());
+      return intersectSignal;
    }
 
    @Override
    public String toString() {
       String outString = "{";
-      for (Signal pulse : this.pulses) {
+      for (Signal pulse : this) {
          outString += String.format("\n\t%s", pulse);
       }
       outString += "}";
@@ -156,16 +116,16 @@ public class Signal {
    }
 
    // Accessors
-   public float getTStart() {
-      return tStart.floatValue();
+   public int getTStart() {
+      return tStart.intValue();
    }
 
-   public float getTStop() {
-      return tStop.floatValue();
+   public int getTStop() {
+      return tStop.intValue();
    }
 
-   public float getTime() {
-      return (this.getTStart() + this.getTStop()) / 2f;
+   public int getTime() {
+      return (this.getTStart() + this.getTStop()) / 2;
    }
 
    public float getValue() {
@@ -176,38 +136,38 @@ public class Signal {
       }
    }
 
-   public void setLowerBound(float lowerBound) {
+   public void setLowerBound(int lowerBound) {
       this.lowerBound = lowerBound;
    }
 
-   public void setUpperBound(float upperBound) {
+   public void setUpperBound(int upperBound) {
       this.upperBound = upperBound;
    }
 
-   public Signal get(int i) {
-      return this.pulses.get(i);
+   public Signal get(int time) {
+      return this.pulses.get(time);
+   }
+
+   public Signal firstEntry() {
+      return this.pulses.firstEntry().getValue();
+   }
+
+   public Signal lastEntry() {
+      return this.pulses.lastEntry().getValue();
    }
 
    public int size() {
       return this.pulses.size();
    }
 
-   public Iterable<Signal> getPulses() {
-      return this.pulses.entrySet().iterator();
-   }
-
    public List<Signal> toList() {
-      List<Signal> outList = new ArrayList<Signal>();
+      List<Signal> outList = new LinkedList<Signal>();
 
-      for (Signal pulse : this.getPulses()) {
+      for (Signal pulse : this) {
          outList.add(pulse);
       }
 
       return outList;
-   }
-
-   public Iterator<Signal> iterator() {
-      return this.pulses.iterator();
    }
 
    public void setValue(float wholeSignalValue) {
@@ -217,17 +177,16 @@ public class Signal {
    public double[] toDoubleValuesArray() {
       double[] valuesArray = new double[this.pulses.size()];
       int i = -1;
-      for (Signal pulse : this.pulses) {
+      for (Signal pulse : this) {
          valuesArray[++i] = pulse.getValue();
       }
-
       return valuesArray;
    }
 
    public Signal cloneAtLevel(int level) {
       Signal signalClone = new Signal(this.getTStart(), this.getTStop(), this.getValue());
 
-      for (Signal pulse : this.getPulses()) {
+      for (Signal pulse : this) {
          if (level > 0) { // Clone objects
             signalClone.addPulse(pulse.cloneAtLevel(level - 1));
          } else { // copy object references
@@ -237,27 +196,24 @@ public class Signal {
       return signalClone;
    }
 
+   public int getSize() {
+      return size;
+   }
+
+   @Override
    public Signal clone() {
       return this.cloneAtLevel(Integer.MAX_VALUE);
+   }
 
+   public Iterator<Signal> iterator() {
+      return new SignalIterator();
+   }
 
+   public SignalStats getStatistics() {
+      return new SignalStats(this);
    }
 
    // Auxiliary classes
-   private static class SignalComparatorByPosition implements Comparator<Signal> {
-
-      public int compare(Signal o1, Signal o2) {
-         return (o1.getTime() < o2.getTime() ? -1
-                 : (o1.getTime() == o2.getTime() ? 0 : 1));
-      }
-   }
-
-   public static Comparator<Signal> comparatorByPosition() {
-      return new SignalComparatorByPosition();
-
-
-   }
-
    private static class SignalComparatorByValue implements Comparator<Signal> {
 
       public int compare(Signal o1, Signal o2) {
@@ -268,5 +224,28 @@ public class Signal {
 
    public static Comparator<Signal> comparatorByValue() {
       return new SignalComparatorByValue();
+   }
+
+   private class SignalIterator implements Iterator<Signal> {
+
+      Iterator innerIterator;
+
+      public SignalIterator() {
+         super();
+         innerIterator = pulses.entrySet().iterator();
+      }
+
+      public boolean hasNext() {
+         return innerIterator.hasNext();
+      }
+
+      public Signal next() {
+         Map.Entry<Float, Signal> nextOne = (Map.Entry<Float, Signal>) innerIterator.next();
+         return nextOne.getValue();
+      }
+
+      public void remove() {
+         throw new UnsupportedOperationException("Not supported yet.");
+      }
    }
 }

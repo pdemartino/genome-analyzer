@@ -1,12 +1,6 @@
 package com.dmp.signalanalyzer.configuration;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  *
@@ -20,9 +14,9 @@ public class ConfigurationManager {
    private int numAnalysis = 8;
    private float stepMultiplier = 1f / 2f; // half a time a window
    private float windowsMultiplier = 1f / 20f;
-   private char inputFileSeparatorChar = ' ';
-   private char outputFileSeparatorChar = ' ';
-   private String outputFileExtension = ".csv";
+   private String inputFileSeparator = ",";
+   private String outputFileSeparator = ",";
+   private String outputFileExtension = "csv";
    private static boolean bufferedReaderAsDefault = false;
 
    public static ConfigurationManager getInstance() {
@@ -61,20 +55,20 @@ public class ConfigurationManager {
       this.windowsMultiplier = windowsMultiplier;
    }
 
-   public char getInputFileSeparatorChar() {
-      return inputFileSeparatorChar;
+   public String getInputFileSeparator() {
+      return inputFileSeparator;
    }
 
-   public void setInputFileSeparatorChar(char inputFileSeparatorChar) {
-      this.inputFileSeparatorChar = inputFileSeparatorChar;
+   public void setInputFileSeparator(String inputFileSeparator) {
+      this.inputFileSeparator = inputFileSeparator;
    }
 
-   public char getOutputFileSeparatorChar() {
-      return outputFileSeparatorChar;
+   public String getOutputFileSeparator() {
+      return outputFileSeparator;
    }
 
-   public void setOutputFileSeparatorChar(char outputFileSeparatorChar) {
-      this.outputFileSeparatorChar = outputFileSeparatorChar;
+   public void setOutputFileSeparator(String outputFileSeparator) {
+      this.outputFileSeparator = outputFileSeparator;
    }
 
    public String getOutputFileExtension() {
@@ -100,8 +94,8 @@ public class ConfigurationManager {
    private void loadConfiguration() {
       this.setDefaultLocale(Locale.US);
 
-      this.setInputFileSeparatorChar(propertiesManager.getProperty("inputFileSeparatorChar").charAt(0));
-      this.setOutputFileSeparatorChar(propertiesManager.getProperty("outputFileSeparatorChar").charAt(0));
+      this.setInputFileSeparator(propertiesManager.getProperty("inputFileSeparator"));
+      this.setOutputFileSeparator(propertiesManager.getProperty("outputFileSeparator"));
       this.setOutputFileExtension(propertiesManager.getProperty("outputFileExtension"));
       this.setBufferedReaderAsDefault(Boolean.getBoolean(propertiesManager.getProperty("bufferedReaderAsDefault")));
       
