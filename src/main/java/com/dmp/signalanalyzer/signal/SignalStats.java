@@ -25,7 +25,7 @@ public class SignalStats {
       computeRangeStats(signal);
       computeValueStats(signal);
       computeDistanceStats(signal);
-      numberOfItems = signal.getSize();
+      numberOfItems = signal.count();
    }
 
    private void computeValueStats(Signal signal) {
@@ -51,7 +51,7 @@ public class SignalStats {
       this.minValue = minMethodValue;
       this.maxValue = maxMethodValue;
       this.minGTZero = minMethodGTZero;
-      this.meanValue = sumMethodValue / signal.getSize();
+      this.meanValue = sumMethodValue / signal.count();
    }
 
    private void computeDistanceStats(Signal signal) {
@@ -60,7 +60,7 @@ public class SignalStats {
       // Use an array to keep track of distances, needed to easly compute
       // median and 90perc
       int i = 0;
-      double[] distances = new double[signal.getSize()];
+      double[] distances = new double[signal.count()];
       Signal previous = signal.firstEntry();
       for (Signal pulse : signal) {
          if (pulse != previous) {
@@ -84,7 +84,7 @@ public class SignalStats {
       this.maxDistance = maxMethodDistance;
       // do not consider the first item of the signal cause of it has no
       // previous item from which to count the distance
-      this.meanDistance = sumMethodDistance / (signal.getSize() - 1);
+      this.meanDistance = sumMethodDistance / (signal.count() - 1);
    }
 
    @Override

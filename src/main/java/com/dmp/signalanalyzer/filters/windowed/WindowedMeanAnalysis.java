@@ -11,10 +11,10 @@ public class WindowedMeanAnalysis extends WindowedSignalFilter {
 	public float getSingleWindowValue(Signal window){
 		float sum = 0f;
 		
-		for (Signal pulse : window){
-			sum += pulse.getValue();
+		for (Signal component : window){
+			sum += component.getValue();
 		}
-		return sum / (window.getTStop() - window.getTStart());
+		return sum / window.count();
 	}
 
 }

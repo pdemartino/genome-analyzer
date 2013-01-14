@@ -21,7 +21,7 @@ public class Signal implements Iterable<Signal> {
    private Float value = null;
    private int size = 0;
    // Using a TreeMap to automatically keep items ordered by time (the key value)
-   private TreeMap<Integer, Signal> pulses;
+   private TreeMap<Integer, Signal> components;
 
    public Signal(int tStart, int tStop, float value) {
       this();
@@ -38,36 +38,36 @@ public class Signal implements Iterable<Signal> {
       this.reset();
    }
 
-   public void addPulsesArray(float[] signal, int[] positions) throws SignalLengthMismatch {
+   public void addComponentsArray(float[] signal, int[] positions) throws SignalLengthMismatch {
       int len = signal.length;
       if (len == positions.length) {
          for (int i = 0; i < len; i++) {
-            this.addPulse(new Signal(positions[i], signal[i]));
+            this.addComponent(new Signal(positions[i], signal[i]));
          }
       } else {
          throw new SignalLengthMismatch();
       }
    }
 
-   public void addPulsesArray(float[] signal) {
+   public void addComponentsArray(float[] signal) {
       for (int i = 0; i < signal.length; i++) {
-         this.addPulse(new Signal(i, signal[i]));
+         this.addComponent(new Signal(i, signal[i]));
       }
    }
 
-   public boolean addPulse(Signal pulse) {
-      if ((pulse.getTime() >= lowerBound) && (pulse.getTime() <= upperBound)) {
-         if (this.pulses.get(pulse.getTime()) != null) {
-            logger.warn(String.format("Pulse at time %s already existing into Signal!", pulse.getTime()));
+   public boolean addComponent(Signal component) {
+      if ((component.getTime() >= lowerBound) && (component.getTime() <= upperBound)) {
+         if (this.components.get(component.getTime()) != null) {
+            logger.warn(String.format("Component at time %s already existing into Signal!", component.getTime()));
          } else {
-            this.pulses.put(Integer.valueOf(pulse.getTime()), pulse);
+            this.components.put(Integer.valueOf(component.getTime()), component);
             this.size++;
-            if ((this.tStart == null) || (this.tStart > pulse.getTStart())) {
-               this.tStart = pulse.getTStart();
+            if ((this.tStart == null) || (this.tStart > component.getTStart())) {
+               this.tStart = component.getTStart();
             }
 
-            if ((this.tStop == null) || (this.tStop < pulse.getTStop())) {
-               this.tStop = pulse.getTStop();
+            if ((this.tStop == null) || (this.tStop < component.getTStop())) {
+               this.tStop = component.getTStop();
             }
             return true;
          }
@@ -75,30 +75,50 @@ public class Signal implements Iterable<Signal> {
       return false;
    }
 
-   public boolean addPulseIfCanContain(Signal pulse) {
-      return (this.canContain(pulse) && this.addPulse(pulse));
+   public boolean addComponentIfCanContain(Signal component) {
+      return (this.canContain(component) && this.addComponent(component));
    }
 
-   public boolean canContain(Signal pulse) {
-      return ((this.tStart == null || (pulse.getTStart() >= this.getTStart()))
-              && (this.tStop == null || (pulse.getTStop() <= this.getTStop())));
+   public boolean canContain(Signal component) {
+      return ((this.tStart == null || (component.getTStart() >= this.getTStart()))
+              && (this.tStop == null || (component.getTStop() <= this.getTStop())));
    }
 
+   @SuppressWarnings("empty-statement")
+   public float[] distances(){
+      if (this.count() == 0) {
+         float[] distances = {0};
+         return distances;
+      }
+      
+      // the first item has not to be considered
+      float[] distances = new float[this.count()-1];
+      Signal previous = null;
+      int i = 0;
+      for (Signal component : this){
+         if (previous != null){
+            distances[i] = component.getTStart() - previous.getTStop();
+         }
+         previous = component;
+      }
+      return distances;
+   }
+   
    public void reset() {
       this.tStart = null;
       this.tStop = null;
-      this.pulses = new TreeMap<Integer, Signal>();
+      this.components = new TreeMap<Integer, Signal>();
    }
 
    public Signal intersect(Signal secondOne) {
       Signal intersectSignal = new Signal();
 
-      for (Signal pulse : this) {
-         int time = pulse.getTime();
+      for (Signal component : this) {
+         int time = component.getTime();
          Signal otherPulse = secondOne.get(time);
          if (otherPulse != null) {
-            float value = Math.min(pulse.getValue(), otherPulse.getValue());
-            intersectSignal.addPulse(new Signal(time, time, value));
+            float value = Math.min(component.getValue(), otherPulse.getValue());
+            intersectSignal.addComponent(new Signal(time, time, value));
          }
       }
       return intersectSignal;
@@ -145,26 +165,26 @@ public class Signal implements Iterable<Signal> {
    }
 
    public Signal get(int time) {
-      return this.pulses.get(time);
+      return this.components.get(time);
    }
 
    public Signal firstEntry() {
-      return this.pulses.firstEntry().getValue();
+      return this.components.firstEntry().getValue();
    }
 
    public Signal lastEntry() {
-      return this.pulses.lastEntry().getValue();
+      return this.components.lastEntry().getValue();
    }
 
-   public int size() {
-      return this.pulses.size();
+   public int numberOfComponents() {
+      return this.components.size();
    }
 
    public List<Signal> toList() {
       List<Signal> outList = new LinkedList<Signal>();
 
-      for (Signal pulse : this) {
-         outList.add(pulse);
+      for (Signal component : this) {
+         outList.add(component);
       }
 
       return outList;
@@ -175,7 +195,7 @@ public class Signal implements Iterable<Signal> {
    }
 
    public double[] toDoubleValuesArray() {
-      double[] valuesArray = new double[this.pulses.size()];
+      double[] valuesArray = new double[this.components.size()];
       int i = -1;
       for (Signal pulse : this) {
          valuesArray[++i] = pulse.getValue();
@@ -186,18 +206,29 @@ public class Signal implements Iterable<Signal> {
    public Signal cloneAtLevel(int level) {
       Signal signalClone = new Signal(this.getTStart(), this.getTStop(), this.getValue());
 
-      for (Signal pulse : this) {
+      for (Signal component : this) {
          if (level > 0) { // Clone objects
-            signalClone.addPulse(pulse.cloneAtLevel(level - 1));
+            signalClone.addComponent(component.cloneAtLevel(level - 1));
          } else { // copy object references
-            signalClone.addPulse(pulse);
+            signalClone.addComponent(component);
          }
       }
       return signalClone;
    }
 
-   public int getSize() {
+   public int count() {
       return size;
+   }
+   
+   public Signal flat(){
+      Signal flatted = new Signal();
+      for (Signal window : this){
+         float flattedValue = window.getValue();
+         for (Signal component : window){
+            flatted.addComponent(new Signal(component.getTStart(),component.getTStop(),flattedValue));
+         }
+      }
+      return flatted;
    }
 
    @Override
@@ -232,7 +263,7 @@ public class Signal implements Iterable<Signal> {
 
       public SignalIterator() {
          super();
-         innerIterator = pulses.entrySet().iterator();
+         innerIterator = components.entrySet().iterator();
       }
 
       public boolean hasNext() {

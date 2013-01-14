@@ -18,7 +18,7 @@ public class TopFivePercent extends SignalFilter {
     private static Signal topFivePercent(Signal signal) {
         // cloneSignal
         Signal reverseValueOrderSignal = signal.cloneAtLevel(1); // clone root and first level
-        int fivePercentCount = (int) Math.ceil((float) reverseValueOrderSignal.size() / 20);
+        int fivePercentCount = (int) Math.ceil((float) reverseValueOrderSignal.numberOfComponents() / 20);
         List<Signal> windows = reverseValueOrderSignal.toList();
         
         Collections.sort(windows,Collections.reverseOrder(Signal.comparatorByValue()));

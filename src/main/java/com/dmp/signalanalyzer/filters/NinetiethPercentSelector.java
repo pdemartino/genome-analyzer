@@ -23,7 +23,7 @@ public class NinetiethPercentSelector extends SignalFilter {
       float filteredValue = 0; //{0,1}
       for (Signal pulse : signal){
          filteredValue = pulse.getValue() >= percentileVal ? pulse.getValue() : 0;
-         filteredSignal.addPulse(new Signal(pulse.getTStart(),pulse.getTStop(), filteredValue));
+         filteredSignal.addComponent(new Signal(pulse.getTStart(),pulse.getTStop(), filteredValue));
       }
       
       return filteredSignal;

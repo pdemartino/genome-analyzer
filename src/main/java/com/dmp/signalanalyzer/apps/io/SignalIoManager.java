@@ -33,7 +33,7 @@ public class SignalIoManager {
       String separator = ConfigurationManager.getInstance().getOutputFileSeparator();
       
       String filePath = getFilePath(outputDirectory, analysisName, fileNameAppend);
-      logger.info(String.format("Writing %s items into %s..." ,signal.getSize(),filePath));
+      logger.info(String.format("Writing %s items into %s..." ,signal.count(),filePath));
       Writer fwr = new FileWriter(filePath);
 
       if (bufferedWriting) {

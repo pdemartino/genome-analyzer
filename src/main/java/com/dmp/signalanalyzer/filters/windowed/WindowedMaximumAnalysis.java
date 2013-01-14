@@ -16,6 +16,6 @@ public class WindowedMaximumAnalysis extends WindowedSignalFilter {
             maximum = pulse.getValue();
          }
       }
-      return maximum / (window.getTStop() - window.getTStart());
+      return maximum;
    }
 }

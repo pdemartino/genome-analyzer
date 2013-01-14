@@ -27,7 +27,7 @@ public class HighPassFilter extends SignalFilter{
           
           previousPulse = pulse;
           previousFiltered = new Signal(pulse.getTime(), filteredValue);
-          filteredSignal.addPulse(previousFiltered);
+          filteredSignal.addComponent(previousFiltered);
       }
       
       return filteredSignal;

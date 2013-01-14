@@ -22,7 +22,7 @@ public class SignalTest extends TestCase {
       Signal signal = new Signal();
       for (int i = 0; i < numberOfItems; i++){
          float randomValue = rndObj.nextFloat();
-         signal.addPulse(new Signal(i, i, randomValue));
+         signal.addComponent(new Signal(i, i, randomValue));
          assertTrue("Value mismatch on items " + i, signal.get(i).getValue() == randomValue);
       }
    }
@@ -33,7 +33,7 @@ public class SignalTest extends TestCase {
       Signal signal = new Signal();
       // insert iterm in reverse order
       for (int i = lastEntryTime; i >= firstEntryTime; i--) {
-         signal.addPulse(new Signal(i, i, i));
+         signal.addComponent(new Signal(i, i, i));
       }
 
       // test first and last
@@ -54,7 +54,7 @@ public class SignalTest extends TestCase {
       Signal signal = new Signal();
       // insert iterm in ascending order
       for (int i = 1; i <= 10; i++) {
-         signal.addPulse(new Signal(i, i, i));
+         signal.addComponent(new Signal(i, i, i));
       }
 
       // test if they are oredered descending by time
@@ -92,8 +92,8 @@ public class SignalTest extends TestCase {
       Signal sigobj1 = new Signal();
       Signal sigobj2 = new Signal();
       for (int i = 0; i < numberOfItems; i++) {
-         sigobj1.addPulse(new Signal(i, i));
-         sigobj2.addPulse(new Signal(i, i));
+         sigobj1.addComponent(new Signal(i, i));
+         sigobj2.addComponent(new Signal(i, i));
       }
 
       // Intersect reassigning the variable
@@ -116,7 +116,7 @@ public class SignalTest extends TestCase {
       for (int i = 0; i < numberOfItems; i++) {
          signal[i] = rndObj.nextFloat();
       }
-      outSignal.addPulsesArray(signal);
+      outSignal.addComponentsArray(signal);
 
       return outSignal;
    }

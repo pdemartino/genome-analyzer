@@ -23,7 +23,7 @@ public class LowPass extends SignalFilter {
 
    public Signal filter(Signal inputSignal) {
       Signal filteredSignal;
-      logger.debug(String.format("Filtering %s long signal...",inputSignal.getSize()));
+      logger.debug(String.format("Filtering %s long signal...",inputSignal.count()));
       logger.debug(String.format("Using configuration: %s", filterConfiguration));
       
       refreshConfiguration();
@@ -54,7 +54,7 @@ public class LowPass extends SignalFilter {
 
       Signal firstItem = signalList.get(0);
       Signal prevFiltered = new Signal(firstItem.getTime(), firstItem.getValue());
-      filteredSignal.addPulse(prevFiltered);
+      filteredSignal.addComponent(prevFiltered);
 
       float filteredValue;
       for (Signal pTmp : signalList) {
@@ -64,10 +64,10 @@ public class LowPass extends SignalFilter {
                     + (pTmp.getValue() - prevFiltered.getValue()) / smoothingFactor;
 
             prevFiltered = new Signal(pTmp.getTime(), filteredValue);
-            filteredSignal.addPulse(prevFiltered);
+            filteredSignal.addComponent(prevFiltered);
          }
       }
-      logger.debug(String.format("Generated a %s long filtered signal",filteredSignal.getSize()));
+      logger.debug(String.format("Generated a %s long filtered signal",filteredSignal.count()));
 
       return filteredSignal;
    }
@@ -79,11 +79,11 @@ public class LowPass extends SignalFilter {
       float minDistance = Float.MAX_VALUE;
       // retrieve max and min distance
       Signal previuos = signal.firstEntry();
-      for (Signal pulse : signal) {
-         float distance = pulse.getTime() - previuos.getTime();
+      for (Signal component : signal) {
+         float distance = component.getTime() - previuos.getTime();
          maxDistance = Math.max(maxDistance, distance);
          minDistance = Math.min(minDistance, distance);
-         previuos = pulse;
+         previuos = component;
       }
       distanceFactors.put("minDistance", minDistance);
       distanceFactors.put("maxDistance", maxDistance);
@@ -120,12 +120,12 @@ public class LowPass extends SignalFilter {
 
       float scalingFactor;
       Signal previous = null;
-      for (Signal pulse : inputSignal) {
+      for (Signal component : inputSignal) {
          scalingFactor = previous == null ? 1
-                 : 1 - (Math.abs(previous.getTime() - pulse.getTime()) - minDistance) / distanceRange;
-         scaledSignal.addPulse(
-                 new Signal(pulse.getTStart(), pulse.getTStop(), scalingFactor * pulse.getValue()));
-         previous = pulse;
+                 : 1 - (Math.abs(previous.getTime() - component.getTime()) - minDistance) / distanceRange;
+         scaledSignal.addComponent(
+                 new Signal(component.getTStart(), component.getTStop(), scalingFactor * component.getValue()));
+         previous = component;
       }
 
       return scaledSignal;

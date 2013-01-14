@@ -13,12 +13,14 @@ import com.dmp.signalanalyzer.filters.LowPass;
 import com.dmp.signalanalyzer.filters.NinetiethPercentSelector;
 import com.dmp.signalanalyzer.filters.SignalFilter;
 import com.dmp.signalanalyzer.filters.UnbiasFilter;
+import com.dmp.signalanalyzer.filters.windowed.WindowedMeanAnalysis;
+import com.dmp.signalanalyzer.filters.windowed.WindowedMedianAnalysis;
+import com.dmp.signalanalyzer.filters.windowed.WindowedNinetiethPercentileAnalysis;
 import com.dmp.signalanalyzer.signal.Signal;
 import com.dmp.signalanalyzer.signal.SignalStats;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
@@ -100,13 +102,19 @@ public class Main {
          } else if (analysis.startsWith("composite")) {
             sa = new CompositeLpHpUnbiasFilter();
             fileNameAppend = retrieveFilterConfigurationByName(analysis, filterConfiguration);
+         } else if  (analysis.startsWith("winmean")){
+            sa = new WindowedMeanAnalysis();
+         } else if (analysis.startsWith("winmedian")){
+            sa = new WindowedMedianAnalysis();
+         } else if (analysis.startsWith("win90perc")){
+            sa = new WindowedNinetiethPercentileAnalysis();
          } else {
             continue; // skip wrong requests
          }
          sa.setFilterConfiguration(filterConfiguration);
          logger.debug(String.format("Running %s with configuration: %s", sa.getName(), sa.getFilterConfiguration()));
          outSignal = sa.filter(inputSignal);
-         logger.debug(String.format("%s analysis generated a signal $s items long, writing it to file...", sa.getName(), outSignal.getSize()));
+         logger.debug(String.format("%s analysis generated a signal $s items long, writing it to file...", sa.getName(), outSignal.count()));
          SignalIoManager.writeToFile(outSignal, outPutDirectory, sa.getName(), fileNameAppend);
 
          // Mark Selected 
@@ -169,11 +177,11 @@ public class Main {
          Integer positionsColumn = (Integer) positionArguments[1];
          logger.debug(String.format("Loading positions from %s from column %s (ColSeparator: %s)", positionsFileName, positionsColumn, configurationManager.getInputFileSeparator()));
          int[] positionsArray = InputFilesLoader.csvToIntegerArray(positionsFileName, positionsColumn, configurationManager.getInputFileSeparator());
-         inputSignal.addPulsesArray(signalArray, positionsArray);
+         inputSignal.addComponentsArray(signalArray, positionsArray);
       } else {
-         inputSignal.addPulsesArray(signalArray);
+         inputSignal.addComponentsArray(signalArray);
       }
-      logger.debug(String.format("Loaded a signal %s items long", inputSignal.getSize()));
+      logger.debug(String.format("Loaded a signal %s items long", inputSignal.count()));
       return inputSignal;
    }
 

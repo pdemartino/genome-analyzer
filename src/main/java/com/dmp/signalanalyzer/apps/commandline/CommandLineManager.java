@@ -35,6 +35,7 @@ public class CommandLineManager {
       this.arguments = new HashMap<String, Object>();
 
       for (CommandLineOption option : CommandLineOption.values()) {
+         System.out.println("Checking for " + option.name());
          if (cmLine.hasOption(option.name())) {
             arguments.put(option.name(), cmLine.getOptionValue(option.name()));
          }
@@ -52,7 +53,7 @@ public class CommandLineManager {
       for (CommandLineOption option : CommandLineOption.values()) {
          commandLineOptions.addOption(
                  OptionBuilder
-                 .hasArg(option.hasArguments())
+                 .hasOptionalArgs(option.getMaxNumOfArguments())
                  .withArgName(option.getArgumentName())
                  .isRequired(option.isMandatory())
                  .withDescription(option.getDescription())
