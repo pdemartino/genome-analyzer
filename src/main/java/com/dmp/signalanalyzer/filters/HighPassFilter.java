@@ -22,7 +22,7 @@ public class HighPassFilter extends SignalFilter{
       
       Signal previousPulse = firstItem;
       for (Signal pulse : inputSignal){
-          float filteredValue = (alpha * previousFiltered.getValue()) +
+          double filteredValue = (alpha * previousFiltered.getValue()) +
                   (beta * (pulse.getValue() - previousPulse.getValue()));
           
           previousPulse = pulse;

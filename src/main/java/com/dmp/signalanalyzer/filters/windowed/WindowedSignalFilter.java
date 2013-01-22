@@ -14,16 +14,16 @@ public abstract class WindowedSignalFilter extends SignalFilter {
    public Signal filter(Signal inputSignal) {
       Signal windowedSignal = generateWindowedSignal(inputSignal);
       // get statistics
-      float[] minMaxLociSize = getMinMaxLociCount(windowedSignal);
-      float[] minMaxComponentsSize = getMinMaxComponentsCount(windowedSignal);
-      float[] minMaxComponentsDistance = getMinMaxComponentsDistance(windowedSignal);
+      double[] minMaxLociSize = getMinMaxLociCount(windowedSignal);
+      double[] minMaxComponentsSize = getMinMaxComponentsCount(windowedSignal);
+      double[] minMaxComponentsDistance = getMinMaxComponentsDistance(windowedSignal);
 
-      float winValue;
+      double winValue;
       for (Signal window : windowedSignal) {
          winValue = getSingleWindowValue(window);
          winValue = windowGeneticAdjustment(winValue, window,
                  minMaxComponentsDistance, minMaxComponentsSize, minMaxLociSize);
-         if (Float.isNaN(winValue)) {
+         if (Double.isNaN(winValue)) {
             winValue = 0f;
          }
          window.setValue(winValue);
@@ -36,17 +36,17 @@ public abstract class WindowedSignalFilter extends SignalFilter {
       Signal windowedSignal = new Signal();
 
       
-      int winSize = filterConfiguration.get("window") != null
-              ? ((Float) filterConfiguration.get("window")).intValue()
-              : (int) ((inputSignal.getTStop() + inputSignal.getTStart()) / 2 * configurationManager.getWindowsMultiplier());
+      double winSize = filterConfiguration.get("window") != null
+              ? ((Double) filterConfiguration.get("window")).intValue()
+              : (double) ((inputSignal.getTStop() + inputSignal.getTStart()) / 2 * configurationManager.getWindowsMultiplier());
 
-      int stSize = filterConfiguration.get("step") != null
-              ? ((Float) filterConfiguration.get("step")).intValue()
-              : (int) (winSize * configurationManager.getStepMultiplier());
+      double stSize = filterConfiguration.get("step") != null
+              ? ((Double) filterConfiguration.get("step")).intValue()
+              : (double) (winSize * configurationManager.getStepMultiplier());
 
       // Create Windows
-      int start = inputSignal.getTStart();
-      int stop;
+      double start = inputSignal.getTStart();
+      double stop;
       while (start <= inputSignal.getTStop()) {
          stop = Math.min(start + winSize, inputSignal.getTStop());
          Signal window = new Signal(start, stop, 0f);
@@ -69,8 +69,8 @@ public abstract class WindowedSignalFilter extends SignalFilter {
       return windowedSignal;
    }
 
-   private static float[] getMinMaxComponentsCount(Signal signal) {
-      float[] minMax = {Float.MAX_VALUE, -1 * Float.MAX_VALUE};
+   private static double[] getMinMaxComponentsCount(Signal signal) {
+      double[] minMax = {Double.MAX_VALUE, -1 * Double.MAX_VALUE};
       for (Signal window : signal) {
          minMax[0] = Math.min(window.count(), minMax[0]);
          minMax[1] = Math.max(window.count(), minMax[1]);
@@ -78,44 +78,44 @@ public abstract class WindowedSignalFilter extends SignalFilter {
       return minMax;
    }
 
-   private static float[] getMinMaxLociCount(Signal signal) {
-      float[] minMax = {Float.MAX_VALUE, -1 * Float.MAX_VALUE};
+   private static double[] getMinMaxLociCount(Signal signal) {
+      double[] minMax = {Double.MAX_VALUE, -1 * Double.MAX_VALUE};
       for (Signal window : signal) {
-         float lociCount = window.getTStop() - window.getTStart();
+         double lociCount = window.getTStop() - window.getTStart();
          minMax[0] = Math.min(lociCount, minMax[0]);
          minMax[1] = Math.max(lociCount, minMax[1]);
       }
       return minMax;
    }
 
-   private static float[] getMinMaxComponentsDistance(Signal signal) {
-      float[] minMax = {Float.MAX_VALUE, -1 * Float.MAX_VALUE};
+   private static double[] getMinMaxComponentsDistance(Signal signal) {
+      double[] minMax = {Double.MAX_VALUE, -1 * Double.MAX_VALUE};
 
       for (Signal window : signal) {
-         float[] windowDistances = window.distances();
+         double[] windowDistances = window.distances();
          minMax[0] = Math.min(SAMath.min(windowDistances), minMax[0]);
          minMax[1] = Math.max(SAMath.max(windowDistances), minMax[1]);
       }
       return minMax;
    }
 
-   private static float windowGeneticAdjustment(float winValue, Signal window,
-           float[] mMCompDistance, float[] mMCompCount, float[] mMLociCount) {
+   private static double windowGeneticAdjustment(double winValue, Signal window,
+           double[] mMCompDistance, double[] mMCompCount, double[] mMLociCount) {
 
       // the more the window is large, the less you have to consider the value
-      float compDistanceNorm =
+      double compDistanceNorm =
               winValue
               * SAMath.minMaxNormalization(
               SAMath.average(window.distances()), mMCompDistance[0], mMCompDistance[1]);
 
       // the more snps the window has, the more you have to consider the value
-      float compCountNorm =
+      double compCountNorm =
               winValue
               * SAMath.minMaxNormalization(
               window.count(), mMCompCount[0], mMCompCount[1]);
 
       // the more is the inter-snp distance, the less you have to consider the value
-      float lociCountNorm =
+      double lociCountNorm =
               winValue
               * SAMath.minMaxNormalization(
               window.getTStop() - window.getTStart(), mMLociCount[0], mMLociCount[1]);
@@ -123,5 +123,5 @@ public abstract class WindowedSignalFilter extends SignalFilter {
       return SAMath.average(compDistanceNorm, compCountNorm);
    }
 
-   public abstract float getSingleWindowValue(Signal window);
+   public abstract double getSingleWindowValue(Signal window);
 }

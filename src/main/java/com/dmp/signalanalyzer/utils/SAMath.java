@@ -13,17 +13,17 @@ public class SAMath {
     * @param max
     * @return
     */
-   public static float minMaxNormalization(float value, float min, float max){
-      float range = max - min;
-      float normalized = (value - min) / range;
+   public static double minMaxNormalization(double value, double min, double max){
+      double range = max - min;
+      double normalized = (value - min) / range;
       return normalized;
    }
    
-   public static float average(float... values){
+   public static double average(double... values){
       int count = 0;
-      float sum = 0;
+      double sum = 0;
       
-      for (float value : values){
+      for (double value : values){
          sum += value;
          count++;
       }
@@ -31,17 +31,17 @@ public class SAMath {
       return count==0 ? 0 : sum / count;
    }
    
-   public static float min(float... values){
-      float min = Float.MAX_VALUE;
-      for (float value : values){
+   public static double min(double... values){
+      double min = Double.MAX_VALUE;
+      for (double value : values){
          min = Math.min(min, value);
       }
       return min;
    }
    
-   public static float max(float... values){
-      float max = -1 * Float.MAX_VALUE;
-      for (float value : values){
+   public static double max(double... values){
+      double max = -1 * Double.MAX_VALUE;
+      for (double value : values){
          max = Math.max(max, value);
       }
       return max;

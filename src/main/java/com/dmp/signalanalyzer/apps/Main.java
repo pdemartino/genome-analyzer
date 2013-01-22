@@ -67,14 +67,14 @@ public class Main {
       NinetiethPercentSelector ninetiethPercSelector = new NinetiethPercentSelector();
 
       // Step 2: compute step and window for windowed analysis
-      float windowMultiplier = configurationManager.getWindowsMultiplier();
-      float window = inputSignal.getTStop() * windowMultiplier;
+      double windowMultiplier = configurationManager.getWindowsMultiplier();
+      double window = inputSignal.getTStop() * windowMultiplier;
 
-      float stepMultiplier = configurationManager.getStepMultiplier();
-      float step = window * stepMultiplier;
+      double stepMultiplier = configurationManager.getStepMultiplier();
+      double step = window * stepMultiplier;
 
-      filterConfiguration.set("window", Float.valueOf(window));
-      filterConfiguration.set("step", Float.valueOf(step));
+      filterConfiguration.set("window", Double.valueOf(window));
+      filterConfiguration.set("step", Double.valueOf(step));
 
       // Step 3: start analysing signal
       String[] analysisToPerform = CommandLineManager.splitMultipleArguments((String)clm.getArguments().get(CommandLineOption.analysis.name()));
@@ -168,7 +168,7 @@ public class Main {
       String signalValuesFileName = (String) signalArguments[0];
       Integer signalValuesColumn = (Integer) signalArguments[1];
       logger.debug(String.format("Loading signal values from %s from column %s (ColSeparator: %s)", signalValuesFileName, signalValuesColumn, configurationManager.getInputFileSeparator()));
-      float[] signalArray = InputFilesLoader.csvToFloatArray(signalValuesFileName, signalValuesColumn.intValue(), configurationManager.getInputFileSeparator());
+      double[] signalArray = InputFilesLoader.csvToDoubleArray(signalValuesFileName, signalValuesColumn.intValue(), configurationManager.getInputFileSeparator());
 
 
       if (clm.getArguments().containsKey(CommandLineOption.positions.name())) {
@@ -176,7 +176,7 @@ public class Main {
          String positionsFileName = (String) positionArguments[0];
          Integer positionsColumn = (Integer) positionArguments[1];
          logger.debug(String.format("Loading positions from %s from column %s (ColSeparator: %s)", positionsFileName, positionsColumn, configurationManager.getInputFileSeparator()));
-         int[] positionsArray = InputFilesLoader.csvToIntegerArray(positionsFileName, positionsColumn, configurationManager.getInputFileSeparator());
+         double[] positionsArray = InputFilesLoader.csvToDoubleArray(positionsFileName, positionsColumn, configurationManager.getInputFileSeparator());
          inputSignal.addComponentsArray(signalArray, positionsArray);
       } else {
          inputSignal.addComponentsArray(signalArray);

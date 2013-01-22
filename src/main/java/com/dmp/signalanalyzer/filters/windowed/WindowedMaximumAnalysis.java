@@ -8,8 +8,8 @@ import com.dmp.signalanalyzer.signal.Signal;
  */
 public class WindowedMaximumAnalysis extends WindowedSignalFilter {
 
-   public float getSingleWindowValue(Signal window) {
-      float maximum = 0f;
+   public double getSingleWindowValue(Signal window) {
+      double maximum = 0;
 
       for (Signal pulse : window){
          if (pulse.getValue() > maximum) {

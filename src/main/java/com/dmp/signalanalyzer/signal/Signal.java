@@ -21,8 +21,8 @@ public class Signal implements Iterable<Signal> {
    private int size = 0;
    // Using a TreeMap to automatically keep items ordered by time (the key value)
    private TreeMap<Double, Signal> components;
-   private double lowerBound;
-   private double upperBound;
+   private double lowerBound = Double.NEGATIVE_INFINITY;
+   private double upperBound = Double.POSITIVE_INFINITY;
 
    public Signal(double tStart, double tStop, double value) {
       this();

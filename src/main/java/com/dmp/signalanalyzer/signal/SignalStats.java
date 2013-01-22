@@ -12,12 +12,12 @@ import org.apache.commons.math.stat.descriptive.rank.Percentile;
  */
 public class SignalStats {
    Percentile percentile = new Percentile();
-   float start,stop,rangeLen;
-   float minValue, maxValue, meanValue;
+   double start,stop,rangeLen;
+   double minValue, maxValue, meanValue;
    double medianValue, ninetiethPercValue;
-   float minDistance, maxDistance, meanDistance;
+   double minDistance, maxDistance, meanDistance;
    int numberOfItems;
-   float minGTZero;
+   double minGTZero;
    private double medianDistance;
    private double ninetiethPercDistance;
 
@@ -29,8 +29,8 @@ public class SignalStats {
    }
 
    private void computeValueStats(Signal signal) {
-      float minMethodValue = Float.MAX_VALUE, maxMethodValue = -1 * Float.MAX_VALUE, sumMethodValue = 0f;
-      float minMethodGTZero = minMethodValue;
+      double minMethodValue = Double.MAX_VALUE, maxMethodValue = -1 * Double.MAX_VALUE, sumMethodValue = 0f;
+      double minMethodGTZero = minMethodValue;
 
       for (Signal pulse : signal) {
          minMethodValue = Math.min(pulse.getValue(), minMethodValue);
@@ -55,7 +55,7 @@ public class SignalStats {
    }
 
    private void computeDistanceStats(Signal signal) {
-      float minMethodDistance = Float.MAX_VALUE, maxMethodDistance = -1 * Float.MAX_VALUE, sumMethodDistance = 0f;
+      double minMethodDistance = Double.MAX_VALUE, maxMethodDistance = -1 * Double.MAX_VALUE, sumMethodDistance = 0f;
       
       // Use an array to keep track of distances, needed to easly compute
       // median and 90perc
@@ -64,7 +64,7 @@ public class SignalStats {
       Signal previous = signal.firstEntry();
       for (Signal pulse : signal) {
          if (pulse != previous) {
-            float distance = Math.abs(pulse.getTime() - previous.getTime());
+            double distance = Math.abs(pulse.getTime() - previous.getTime());
             distances[i++] = distance;
             minMethodDistance = Math.min(distance, minMethodDistance);
             maxMethodDistance = Math.max(distance, maxMethodDistance);

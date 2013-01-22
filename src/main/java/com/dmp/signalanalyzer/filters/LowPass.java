@@ -56,7 +56,7 @@ public class LowPass extends SignalFilter {
       Signal prevFiltered = new Signal(firstItem.getTime(), firstItem.getValue());
       filteredSignal.addComponent(prevFiltered);
 
-      float filteredValue;
+      double filteredValue;
       for (Signal pTmp : signalList) {
          // skip first item
          if (pTmp != firstItem) {
@@ -72,15 +72,15 @@ public class LowPass extends SignalFilter {
       return filteredSignal;
    }
 
-   private static Map<String, Float> getDistanceFactors(Signal signal) {
-      Map<String, Float> distanceFactors = new HashMap<String, Float>();
+   private static Map<String, Double> getDistanceFactors(Signal signal) {
+      Map<String, Double> distanceFactors = new HashMap<String, Double>();
 
-      float maxDistance = 0f;
-      float minDistance = Float.MAX_VALUE;
+      double maxDistance = 0f;
+      double minDistance = Double.MAX_VALUE;
       // retrieve max and min distance
       Signal previuos = signal.firstEntry();
       for (Signal component : signal) {
-         float distance = component.getTime() - previuos.getTime();
+         double distance = component.getTime() - previuos.getTime();
          maxDistance = Math.max(maxDistance, distance);
          minDistance = Math.min(minDistance, distance);
          previuos = component;
@@ -114,11 +114,11 @@ public class LowPass extends SignalFilter {
    private static Signal applyDistanceScalingFactor(Signal inputSignal) {
       Signal scaledSignal = new Signal();
 
-      Map<String, Float> distanceFactors = getDistanceFactors(inputSignal);
-      float minDistance = distanceFactors.get("minDistance");
-      float distanceRange = distanceFactors.get("distanceRange");
+      Map<String, Double> distanceFactors = getDistanceFactors(inputSignal);
+      double minDistance = distanceFactors.get("minDistance");
+      double distanceRange = distanceFactors.get("distanceRange");
 
-      float scalingFactor;
+      double scalingFactor;
       Signal previous = null;
       for (Signal component : inputSignal) {
          scalingFactor = previous == null ? 1

@@ -20,19 +20,19 @@ public class SignalTest extends TestCase {
       Random rndObj = new Random();
       int numberOfItems = 10;
       Signal signal = new Signal();
-      for (int i = 0; i < numberOfItems; i++){
-         float randomValue = rndObj.nextFloat();
+      for (double i = 0; i < numberOfItems; i++){
+         double randomValue = rndObj.nextDouble();
          signal.addComponent(new Signal(i, i, randomValue));
-         assertTrue("Value mismatch on items " + i, signal.get(i).getValue() == randomValue);
+         assertEquals("Value mismatch on items " + i, randomValue, signal.get(i).getValue(),0.00001);
       }
    }
 
    public void testOrderKeeping() {
-      int firstEntryTime = 1;
-      int lastEntryTime = 10;
+      double firstEntryTime = 1;
+      double lastEntryTime = 10;
       Signal signal = new Signal();
       // insert iterm in reverse order
-      for (int i = lastEntryTime; i >= firstEntryTime; i--) {
+      for (double i = lastEntryTime; i >= firstEntryTime; i--) {
          signal.addComponent(new Signal(i, i, i));
       }
 
@@ -53,7 +53,7 @@ public class SignalTest extends TestCase {
    public void testToReverseList() {
       Signal signal = new Signal();
       // insert iterm in ascending order
-      for (int i = 1; i <= 10; i++) {
+      for (double i = 1; i <= 10; i++) {
          signal.addComponent(new Signal(i, i, i));
       }
 
@@ -77,9 +77,9 @@ public class SignalTest extends TestCase {
 
       for (int i = 0; i < numberOfItems; i++) {
          // I'm using ordinal positions
-         int position = i;
+         double position = i;
          assertFalse(String.format("Item %s of the intersect is null",i),intersect.get(position) == null);
-         assertFalse(String.format("Item %s of the intersect signal is NaN", i),Float.isNaN(intersect.get(position).getValue()));
+         assertFalse(String.format("Item %s of the intersect signal is NaN", i),Double.isNaN(intersect.get(position).getValue()));
          assertTrue(String.format("Wrong intersect value on position %s", i),
                  intersect.get(position).getValue()
                  == Math.min(sigObj1.get(position).getValue(), sigObj2.get(position).getValue()));
@@ -91,7 +91,7 @@ public class SignalTest extends TestCase {
       int numberOfItems = 10;
       Signal sigobj1 = new Signal();
       Signal sigobj2 = new Signal();
-      for (int i = 0; i < numberOfItems; i++) {
+      for (double i = 0; i < numberOfItems; i++) {
          sigobj1.addComponent(new Signal(i, i));
          sigobj2.addComponent(new Signal(i, i));
       }
@@ -101,7 +101,7 @@ public class SignalTest extends TestCase {
       for (int i = 0; i < numberOfItems; i++) {
          assertFalse("", sigobj1.get(i) == null);
          assertTrue("", sigobj1.get(i).getTime() == i);
-         assertFalse("", Float.isNaN(sigobj1.get(i).getValue()));
+         assertFalse("", Double.isNaN(sigobj1.get(i).getValue()));
          assertTrue("", sigobj1.get(i).getValue() == i);
       }
 
@@ -112,9 +112,9 @@ public class SignalTest extends TestCase {
       Signal outSignal = new Signal();
 
       Random rndObj = new Random();
-      float[] signal = new float[numberOfItems];
+      double[] signal = new double[numberOfItems];
       for (int i = 0; i < numberOfItems; i++) {
-         signal[i] = rndObj.nextFloat();
+         signal[i] = rndObj.nextDouble();
       }
       outSignal.addComponentsArray(signal);
 

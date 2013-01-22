@@ -8,8 +8,8 @@ import com.dmp.signalanalyzer.signal.Signal;
 */
 public class WindowedMeanAnalysis extends WindowedSignalFilter {
 	
-	public float getSingleWindowValue(Signal window){
-		float sum = 0f;
+	public double getSingleWindowValue(Signal window){
+		double sum = 0f;
 		
 		for (Signal component : window){
 			sum += component.getValue();
