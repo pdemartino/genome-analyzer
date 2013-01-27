@@ -1,6 +1,7 @@
 package com.dmp.signalanalyzer.apps.io;
 
 import com.dmp.signalanalyzer.configuration.ConfigurationManager;
+import com.dmp.signalanalyzer.signal.RecombinationMap;
 import com.dmp.signalanalyzer.signal.Signal;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -23,12 +24,12 @@ public class SignalIoManager {
    private static Calendar cal = Calendar.getInstance();
    private static SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
 
-   public static void writeToFile(Signal signal, String outputDirectory, String analysisName, String fileNameAppend) throws IOException {
+   public static void writeToFile(Signal signal, RecombinationMap recombinationMap, String outputDirectory, String analysisName, String fileNameAppend) throws IOException {
       ConfigurationManager configurationManager = ConfigurationManager.getInstance();
-      SignalIoManager.writeToFile(signal, outputDirectory, analysisName, fileNameAppend, configurationManager.isBufferedReaderAsDefault());
+      SignalIoManager.writeToFile(signal,recombinationMap, outputDirectory, analysisName, fileNameAppend, configurationManager.isBufferedReaderAsDefault());
    }
 
-   public static void writeToFile(Signal signal, String outputDirectory, String analysisName, String fileNameAppend, boolean bufferedWriting) throws IOException {
+   public static void writeToFile(Signal signal, RecombinationMap recombinationMap, String outputDirectory, String analysisName, String fileNameAppend, boolean bufferedWriting) throws IOException {
       String newLine = "\n";
       String separator = ConfigurationManager.getInstance().getOutputFileSeparator();
       
@@ -41,24 +42,25 @@ public class SignalIoManager {
       }
 
       // Print Header
-      fwr.write("WindowID");
-      fwr.write(separator + "Size");
-      fwr.write(separator + "Start_Position");
-      fwr.write(separator + "Stop_Position");
-      fwr.write(separator + "Center");
+      
+      fwr.write("Position");
+      if (recombinationMap != null){
+          fwr.write(separator + "GeneticMap");
+      }
       fwr.write(separator + "Value");
 
-      int i = 0;
+      
       for (Signal p : signal) {
          fwr.write(newLine);
-         fwr.write(String.valueOf(++i));
-         fwr.write(separator + String.valueOf(p.getTStop() - p.getTStart()));
-         fwr.write(separator + String.valueOf(p.getTStart()));
-         fwr.write(separator + String.valueOf(p.getTStop()));
-         fwr.write(separator + String.valueOf(p.getTime()));
+         if(recombinationMap!=null){
+             Double position = recombinationMap.getPosition(p.getTime());
+             fwr.write(position!=null ? position.toString() : "");
+             fwr.write(separator);
+         }
+         fwr.write(String.valueOf(p.getTime()));
          fwr.write(separator + String.valueOf(p.getValue()));
       }
-      logger.debug(String.format("Written %s lines",i));
+      logger.debug(String.format("Written %s lines",signal.count()));
       fwr.close();
    }
 

@@ -45,11 +45,11 @@ public abstract class WindowedSignalFilter extends SignalFilter {
               : (double) (winSize * configurationManager.getStepMultiplier());
 
       // Create Windows
-      double start = inputSignal.getTStart();
-      double stop;
+      Double start = inputSignal.getTStart();
+      Double stop;
       while (start <= inputSignal.getTStop()) {
          stop = Math.min(start + winSize, inputSignal.getTStop());
-         Signal window = new Signal(start, stop, 0f);
+         Signal window = new Signal(start, stop, 0.);
          windowedSignal.addComponent(window);
          start = start + stSize;
       }

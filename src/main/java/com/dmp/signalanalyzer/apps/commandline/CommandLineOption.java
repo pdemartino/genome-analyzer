@@ -19,6 +19,10 @@ public enum CommandLineOption {
           "signal_filename[:column]",
            "File containing signal values as a column (use '.' (dot) as decimal separator)"),
    
+   recombinationMap(false, 1, 1,
+          "recombination-map_filename:position:genetic-map",
+           "File containing mapping between physical and genetic positions"),
+   
    outputdirectory(true,1,1,
            "output_directory",
            "Directory where to put analysis files (one for each analysis)"),
@@ -43,8 +47,12 @@ public enum CommandLineOption {
            "Consider only values with time/position <= lowerBound"),
    
    stats(false,0,0,
-           "",
-           "Show some statistics about the input signal and exit");
+           " ",
+           "Show some statistics about the input signal and exit"),
+   
+   skipHeader(false,0,0,
+           " ",
+           "Skip header from ALL input csv");
    
    private boolean mandatory = false;
    private int maxNumOfArguments = 0;

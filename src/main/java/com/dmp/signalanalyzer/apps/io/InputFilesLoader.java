@@ -9,104 +9,108 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 
-
 /**
  *
  * @author Pasquale De Martino <paco.dmp@gmail.com>
  */
 public class InputFilesLoader {
-   static final Logger logger = Logger.getLogger(Main.class.getName());
-   
-   public static double[] csvToDoubleArray(String csvFileName, int columnToGet, String separator) throws FileNotFoundException, IOException {
-      logger.debug(String.format("Parsing %s input file to get column %s using separator %s",csvFileName,columnToGet,separator));
-      List<Double> doubleOutList = new ArrayList<Double>();
 
-      BufferedReader oReader = new BufferedReader(new FileReader(csvFileName));
-      String nextLine;
+    static final Logger logger = Logger.getLogger(Main.class.getName());
 
-      while ((nextLine = oReader.readLine()) != null) {
-         String[] nextLineArray = nextLine.split(separator);
-         try {
-            doubleOutList.add(Double.valueOf(nextLineArray[columnToGet]));
-         } catch (NumberFormatException ex) {
-            logger.warn(String.format("The value %s cannot be converted to Float", nextLineArray[columnToGet]));
-         }
-      }
-      logger.debug(String.format("Loaded %s items, converting list to float array and return it out",doubleOutList.size()));
+    public static Double[] csvToDoubleArray(String csvFileName, int columnToGet, String separator, boolean skipHeader) throws FileNotFoundException, IOException {
+        logger.debug(String.format("Parsing %s input file to get column %s using separator %s", csvFileName, columnToGet, separator));
+        List<Double> doubleOutList = new ArrayList<Double>();
 
-      return listToDoubleArray(doubleOutList);
-   }
+        BufferedReader oReader = new BufferedReader(new FileReader(csvFileName));
+        String nextLine;
+        boolean skipLine = skipHeader;
+        while ((nextLine = oReader.readLine()) != null) {
+            if (skipLine) {
+                skipLine = false;
+                continue;
+            }
+            String[] nextLineArray = nextLine.split(separator);
+            try {
+                doubleOutList.add(Double.valueOf(nextLineArray[columnToGet]));
+            } catch (NumberFormatException ex) {
+                logger.warn(String.format("The value %s cannot be converted to Float", nextLineArray[columnToGet]));
+            }
+        }
+        logger.debug(String.format("Loaded %s items, converting list to float array and return it out", doubleOutList.size()));
 
-   public static float[] csvToFloatArray(String csvFileName, int columnToGet, String separator) throws FileNotFoundException, IOException {
-      logger.debug(String.format("Parsing %s input file to get column %s using separator %s",csvFileName,columnToGet,separator));
-      List<Float> floatOutList = new ArrayList<Float>();
+        return doubleOutList.toArray(new Double[0]);
+    }
 
-      BufferedReader oReader = new BufferedReader(new FileReader(csvFileName));
-      String nextLine;
+    public static float[] csvToFloatArray(String csvFileName, int columnToGet, String separator) throws FileNotFoundException, IOException {
+        logger.debug(String.format("Parsing %s input file to get column %s using separator %s", csvFileName, columnToGet, separator));
+        List<Float> floatOutList = new ArrayList<Float>();
 
-      while ((nextLine = oReader.readLine()) != null) {
-         String[] nextLineArray = nextLine.split(separator);
-         try {
-            floatOutList.add(Float.valueOf(nextLineArray[columnToGet]));
-         } catch (NumberFormatException ex) {
-            logger.warn(String.format("The value %s cannot be converted to Float", nextLineArray[columnToGet]));
-         }
-      }
-      logger.debug(String.format("Loaded %s items, converting list to float array and return it out",floatOutList.size()));
+        BufferedReader oReader = new BufferedReader(new FileReader(csvFileName));
+        String nextLine;
 
-      return listToFloatArray(floatOutList);
-   }
-   
-   public static int[] csvToIntegerArray(String csvFileName, int columnToGet, String separator) throws FileNotFoundException, IOException {
-      logger.debug(String.format("Parsing %s input file to get column %s using separator %s",csvFileName,columnToGet,separator));
-      List<Integer> floatOutList = new ArrayList<Integer>();
+        while ((nextLine = oReader.readLine()) != null) {
+            String[] nextLineArray = nextLine.split(separator);
+            try {
+                floatOutList.add(Float.valueOf(nextLineArray[columnToGet]));
+            } catch (NumberFormatException ex) {
+                logger.warn(String.format("The value %s cannot be converted to Float", nextLineArray[columnToGet]));
+            }
+        }
+        logger.debug(String.format("Loaded %s items, converting list to float array and return it out", floatOutList.size()));
 
-      BufferedReader oReader = new BufferedReader(new FileReader(csvFileName));
-      String nextLine;
+        return listToFloatArray(floatOutList);
+    }
 
-      while ((nextLine = oReader.readLine()) != null) {
-         String[] nextLineArray = nextLine.split(separator);
-         try {
-            floatOutList.add(Integer.valueOf(nextLineArray[columnToGet]));
-         } catch (NumberFormatException ex) {
-            logger.warn(String.format("The value %s cannot be converted to Integer", nextLineArray[columnToGet]));
-         }
-      }
-      logger.debug(String.format("Loaded %s items, converting list to float array and return it out",floatOutList.size()));
+    public static int[] csvToIntegerArray(String csvFileName, int columnToGet, String separator) throws FileNotFoundException, IOException {
+        logger.debug(String.format("Parsing %s input file to get column %s using separator %s", csvFileName, columnToGet, separator));
+        List<Integer> floatOutList = new ArrayList<Integer>();
 
-      return listToIntegerArray(floatOutList);
-   }
-   
-   private static double[] listToDoubleArray(List<Double> inputList){
-      double[] outArray = new double[inputList.size()];
+        BufferedReader oReader = new BufferedReader(new FileReader(csvFileName));
+        String nextLine;
 
-      int i = 0;
-      for (Double iDouble : inputList) {
-         outArray[i++] = iDouble.floatValue();
-      }
+        while ((nextLine = oReader.readLine()) != null) {
+            String[] nextLineArray = nextLine.split(separator);
+            try {
+                floatOutList.add(Integer.valueOf(nextLineArray[columnToGet]));
+            } catch (NumberFormatException ex) {
+                logger.warn(String.format("The value %s cannot be converted to Integer", nextLineArray[columnToGet]));
+            }
+        }
+        logger.debug(String.format("Loaded %s items, converting list to float array and return it out", floatOutList.size()));
 
-      return outArray;
-   }
+        return listToIntegerArray(floatOutList);
+    }
 
-   private static float[] listToFloatArray(List<Float> inputList) {
-      float[] outArray = new float[inputList.size()];
+    private static double[] listToDoubleArray(List<Double> inputList) {
+        double[] outArray = new double[inputList.size()];
 
-      int i = 0;
-      for (Float iFloat : inputList) {
-         outArray[i++] = iFloat.floatValue();
-      }
+        int i = 0;
+        for (Double iDouble : inputList) {
+            outArray[i++] = iDouble.floatValue();
+        }
 
-      return outArray;
-   }
-   
-   private static int[] listToIntegerArray(List<Integer> inputList) {
-      int[] outArray = new int[inputList.size()];
+        return outArray;
+    }
 
-      int i = 0;
-      for (Integer iInteger : inputList) {
-         outArray[i++] = iInteger.intValue();
-      }
+    private static float[] listToFloatArray(List<Float> inputList) {
+        float[] outArray = new float[inputList.size()];
 
-      return outArray;
-   }
+        int i = 0;
+        for (Float iFloat : inputList) {
+            outArray[i++] = iFloat.floatValue();
+        }
+
+        return outArray;
+    }
+
+    private static int[] listToIntegerArray(List<Integer> inputList) {
+        int[] outArray = new int[inputList.size()];
+
+        int i = 0;
+        for (Integer iInteger : inputList) {
+            outArray[i++] = iInteger.intValue();
+        }
+
+        return outArray;
+    }
 }

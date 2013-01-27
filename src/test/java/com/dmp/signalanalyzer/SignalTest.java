@@ -16,7 +16,14 @@ import junit.framework.TestCase;
  */
 public class SignalTest extends TestCase {
    
-   public void testAddPulse(){
+   public void testTime(){
+       double time = (new Random()).nextDouble();
+       Signal underTest = new Signal(time, 0.);
+       
+       assertEquals(time, underTest.getTime());
+   }
+    
+    public void testAddPulse(){
       Random rndObj = new Random();
       int numberOfItems = 10;
       Signal signal = new Signal();
@@ -26,7 +33,7 @@ public class SignalTest extends TestCase {
          assertEquals("Value mismatch on items " + i, randomValue, signal.get(i).getValue(),0.00001);
       }
    }
-
+   
    public void testOrderKeeping() {
       double firstEntryTime = 1;
       double lastEntryTime = 10;
@@ -112,7 +119,7 @@ public class SignalTest extends TestCase {
       Signal outSignal = new Signal();
 
       Random rndObj = new Random();
-      double[] signal = new double[numberOfItems];
+      Double[] signal = new Double[numberOfItems];
       for (int i = 0; i < numberOfItems; i++) {
          signal[i] = rndObj.nextDouble();
       }

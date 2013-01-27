@@ -24,14 +24,14 @@ public class Signal implements Iterable<Signal> {
    private double lowerBound = Double.NEGATIVE_INFINITY;
    private double upperBound = Double.POSITIVE_INFINITY;
 
-   public Signal(double tStart, double tStop, double value) {
+   public Signal(Double tStart, Double tStop, Double value) {
       this();
       this.tStart = tStart;
       this.tStop = tStop;
       this.value = value;
    }
 
-   public Signal(double time, double value) {
+   public Signal(Double time, Double value) {
       this(time, time, value);
    }
 
@@ -39,7 +39,7 @@ public class Signal implements Iterable<Signal> {
       this.reset();
    }
 
-   public void addComponentsArray(double[] signal, double[] positions) throws SignalLengthMismatch {
+   public void addComponentsArray(Double[] signal, Double[] positions) throws SignalLengthMismatch {
       int len = signal.length;
       if (len == positions.length) {
          for (int i = 0; i < len; i++) {
@@ -50,9 +50,9 @@ public class Signal implements Iterable<Signal> {
       }
    }
 
-   public void addComponentsArray(double[] signal) {
+   public void addComponentsArray(Double[] signal) {
       for (int i = 0; i < signal.length; i++) {
-         this.addComponent(new Signal(i, signal[i]));
+         this.addComponent(new Signal(Double.valueOf(i), signal[i]));
       }
    }
 
@@ -138,11 +138,11 @@ public class Signal implements Iterable<Signal> {
 
    // Accessors
    public double getTStart() {
-      return tStart.intValue();
+      return tStart;
    }
 
    public double getTStop() {
-      return tStop.intValue();
+      return tStop;
    }
 
    public double getTime() {

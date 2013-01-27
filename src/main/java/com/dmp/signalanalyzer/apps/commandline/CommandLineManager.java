@@ -44,7 +44,7 @@ public class CommandLineManager {
 
    public static void printHelp() {
       HelpFormatter helpFormatter = new HelpFormatter();
-      helpFormatter.printHelp("Syntax", buildOptions());
+      helpFormatter.printHelp(120, "syntaxx", "header", buildOptions(), "footer");
    }
 
    private static Options buildOptions() {
