@@ -1,5 +1,6 @@
 package com.dmp.signalanalyzer.signal;
 
+import com.dmp.signalanalyzer.configuration.ConfigurationManager;
 import com.dmp.signalanalyzer.exceptions.SignalLengthMismatch;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -231,6 +232,32 @@ public class Signal implements Iterable<Signal> {
       }
       return flatted;
    }
+   
+    public Signal applySlidingWindow(double winSize, double stepSize) {
+      Signal windowedSignal = new Signal();
+     
+      // Create Windows
+      Double start = this.getTStart();
+      Double stop;
+      while (start <= this.getTStop()) {
+         stop = Math.min(start + winSize, this.getTStop());
+         Signal window = new Signal(start, stop, 0.);
+         windowedSignal.addComponent(window);
+         start = start + stepSize;
+      }
+
+      // Fill Windows
+      for (Signal pulse : this) {
+         boolean inserted = false;
+         Iterator<Signal> winIterator = windowedSignal.iterator();
+         while(winIterator.hasNext() && !inserted){
+            inserted = winIterator.next().addComponentIfCanContain(pulse);
+         }
+      }
+
+      return windowedSignal;
+   }
+
 
    @Override
    public Signal clone() {

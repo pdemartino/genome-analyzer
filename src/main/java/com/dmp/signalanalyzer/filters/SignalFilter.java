@@ -1,7 +1,6 @@
 package com.dmp.signalanalyzer.filters;
 
 import com.dmp.signalanalyzer.signal.Signal;
-import org.apache.log4j.Logger;
 
 /**
  *
