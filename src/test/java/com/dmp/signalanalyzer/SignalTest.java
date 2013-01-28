@@ -126,11 +126,18 @@ public class SignalTest extends TestCase {
        
        for (Signal component : underTest){
            for (Signal window : windowed){
-               if (component.getTime() <= window.getTStop()
+               if (component.getTime() < window.getTStop()
                        && component.getTime() >= window.getTStart()){
-                   assertTrue(window.get(component.getTime())!= null);
+                   assertTrue(
+                           String.format("Unexpedted missing component %s in win [%s,%s]"
+                           ,component.getTime(),window.getTStart(),window.getTStop()
+                           ),window.get(component.getTime())!= null);
                }else{
-                   assertTrue(window.get(component.getTime())== null);
+                   assertTrue(
+                           String.format("Unexpedted found component %s in win [%s,%s]"
+                           ,component.getTime(),window.getTStart(),window.getTStop()
+                           ),
+                           window.get(component.getTime())== null);
                }
            }
        }
