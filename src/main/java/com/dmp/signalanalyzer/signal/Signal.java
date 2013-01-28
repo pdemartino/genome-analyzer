@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
@@ -19,7 +21,6 @@ public class Signal implements Iterable<Signal> {
    private Logger logger = Logger.getLogger(Signal.class.getName());
    private Double tStart = null, tStop = null;
    private Double value = null;
-   private int size = 0;
    // Using a TreeMap to automatically keep items ordered by time (the key value)
    private TreeMap<Double, Signal> components;
    private double lowerBound = Double.NEGATIVE_INFINITY;
@@ -35,7 +36,7 @@ public class Signal implements Iterable<Signal> {
    public Signal(Double time, Double value) {
       this(time, time, value);
    }
-
+   
    public Signal() {
       this.reset();
    }
@@ -56,6 +57,10 @@ public class Signal implements Iterable<Signal> {
          this.addComponent(new Signal(Double.valueOf(i), signal[i]));
       }
    }
+   
+   public void addComponents(SortedMap<Double,Signal> sortedMap){
+       this.components = new TreeMap<Double, Signal>(sortedMap);
+   }
 
    public boolean addComponent(Signal component) {
       if ((component.getTime() >= lowerBound) && (component.getTime() <= upperBound)) {
@@ -63,7 +68,6 @@ public class Signal implements Iterable<Signal> {
             logger.warn(String.format("Component at time %s already existing into Signal!", component.getTime()));
          } else {
             this.components.put(Double.valueOf(component.getTime()), component);
-            this.size++;
             if ((this.tStart == null) || (this.tStart > component.getTStart())) {
                this.tStart = component.getTStart();
             }
@@ -219,7 +223,7 @@ public class Signal implements Iterable<Signal> {
    }
 
    public int count() {
-      return size;
+      return components.size();
    }
    
    public Signal flat(){
@@ -242,17 +246,9 @@ public class Signal implements Iterable<Signal> {
       while (start <= this.getTStop()) {
          stop = Math.min(start + winSize, this.getTStop());
          Signal window = new Signal(start, stop, 0.);
+         window.addComponents(this.components.subMap(start, stop));
          windowedSignal.addComponent(window);
          start = start + stepSize;
-      }
-
-      // Fill Windows
-      for (Signal pulse : this) {
-         boolean inserted = false;
-         Iterator<Signal> winIterator = windowedSignal.iterator();
-         while(winIterator.hasNext() && !inserted){
-            inserted = winIterator.next().addComponentIfCanContain(pulse);
-         }
       }
 
       return windowedSignal;

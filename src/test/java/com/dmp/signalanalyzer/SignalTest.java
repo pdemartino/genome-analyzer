@@ -114,6 +114,27 @@ public class SignalTest extends TestCase {
 
 
    }
+   
+   public void testApplySlidingWindow(){
+       int numberOfItems = 50;
+       double winSize = numberOfItems / 10.;
+       double stepSize = winSize / 2.;
+       
+       Signal underTest = generateRandomSignalWithOrdinalPositions(numberOfItems);
+       
+       Signal windowed = underTest.applySlidingWindow(winSize, stepSize);
+       
+       for (Signal component : underTest){
+           for (Signal window : windowed){
+               if (component.getTime() <= window.getTStop()
+                       && component.getTime() >= window.getTStart()){
+                   assertTrue(window.get(component.getTime())!= null);
+               }else{
+                   assertTrue(window.get(component.getTime())== null);
+               }
+           }
+       }
+   }
 
    private Signal generateRandomSignalWithOrdinalPositions(int numberOfItems) {
       Signal outSignal = new Signal();
@@ -127,4 +148,6 @@ public class SignalTest extends TestCase {
 
       return outSignal;
    }
+   
+   
 }
