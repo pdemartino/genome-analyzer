@@ -164,11 +164,11 @@ public class Main {
         inputSignal = new Signal();
 
         if (clm.getArguments().containsKey(CommandLineOption.lowerBound.name())) {
-            inputSignal.setLowerBound(((Integer) clm.getArguments().get(CommandLineOption.lowerBound.name())).intValue());
+            inputSignal.setLowerBound( Double.valueOf((String)clm.getArguments().get(CommandLineOption.lowerBound.name())));
         }
 
         if (clm.getArguments().containsKey(CommandLineOption.upperBound.name())) {
-            inputSignal.setUpperBound(((Integer) clm.getArguments().get(CommandLineOption.upperBound.name())).intValue());
+            inputSignal.setUpperBound(Double.valueOf((String)clm.getArguments().get(CommandLineOption.upperBound.name())));
         }
 
         Object[] signalArguments = CommandLineManager.splitFileNameAndColumn((String) clm.getArguments().get(CommandLineOption.signal.name()));

@@ -3,10 +3,6 @@ package com.dmp.signalanalyzer;
 import com.dmp.signalanalyzer.exceptions.SignalLengthMismatch;
 import com.dmp.signalanalyzer.signal.RecombinationMap;
 import com.dmp.signalanalyzer.signal.Signal;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 import junit.framework.TestCase;
 
