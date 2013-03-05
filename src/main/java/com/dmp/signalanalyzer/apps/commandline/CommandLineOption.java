@@ -52,7 +52,10 @@ public enum CommandLineOption {
    
    skipHeader(false,0,0,
            " ",
-           "Skip header from ALL input csv");
+           "Skip header from ALL input csv"),
+   smoothingFactor(false,1,1,
+           "smoothingFactor",
+           "low pass analysis smoothing factor (float)");
    
    private boolean mandatory = false;
    private int maxNumOfArguments = 0;
