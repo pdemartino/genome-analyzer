@@ -83,9 +83,9 @@ public class Main {
       filterConfiguration.set("step", Double.valueOf(step));
 
       if (clm.getArguments().containsKey(CommandLineOption.smoothingFactor.name())) {
-         filterConfiguration.set("smoothingFactor", Double.valueOf((String) clm.getArguments().get(CommandLineOption.smoothingFactor.name())));
+         filterConfiguration.set("smoothingFactor", Float.valueOf((String) clm.getArguments().get(CommandLineOption.smoothingFactor.name())));
       } else {
-         filterConfiguration.set("smoothingFactor", Double.valueOf(configurationManager.getSmoothingFactor()));
+         filterConfiguration.set("smoothingFactor", Float.valueOf(configurationManager.getSmoothingFactor()));
       }
 
       //  start analysing signal
