@@ -81,6 +81,7 @@ public class Main {
 
         filterConfiguration.set("window", Double.valueOf(window));
         filterConfiguration.set("step", Double.valueOf(step));
+        filterConfiguration.set("smoothingFactor", Double.valueOf(configurationManager.getSmoothingFactor()));
 
         //  start analysing signal
         String[] analysisToPerform = CommandLineManager.splitMultipleArguments((String) clm.getArguments().get(CommandLineOption.analysis.name()));

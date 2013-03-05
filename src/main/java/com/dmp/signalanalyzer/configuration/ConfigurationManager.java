@@ -17,6 +17,7 @@ public class ConfigurationManager {
    private String inputFileSeparator = ",";
    private String outputFileSeparator = ",";
    private String outputFileExtension = "csv";
+   private float smoothingFactor = 200f;
    private static boolean bufferedReaderAsDefault = false;
 
    public static ConfigurationManager getInstance() {
@@ -91,6 +92,14 @@ public class ConfigurationManager {
       return this.numAnalysis;
    }
 
+   public float getSmoothingFactor() {
+      return smoothingFactor;
+   }
+
+   public void setSmoothingFactor(float smoothingFactor) {
+      this.smoothingFactor = smoothingFactor;
+   }
+   
    private void loadConfiguration() {
       this.setDefaultLocale(Locale.US);
 
@@ -101,5 +110,7 @@ public class ConfigurationManager {
       
       this.setStepMultiplier(Float.valueOf(propertiesManager.getProperty("stepMultiplier")));
       this.setWindowsMultiplier(Float.valueOf(propertiesManager.getProperty("windowsMultiplier")));
+      
+      this.setSmoothingFactor(Float.valueOf(propertiesManager.getProperty("smoothingFactor")));
    }
 }
