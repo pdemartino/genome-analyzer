@@ -87,6 +87,8 @@ public class Main {
       } else {
          filterConfiguration.set("smoothingFactor", Float.valueOf(configurationManager.getSmoothingFactor()));
       }
+      
+      filterConfiguration.set("normalizeUsingPosition", Boolean.valueOf(configurationManager.isNormalizeUsingPosition()));
 
       //  start analysing signal
       String[] analysisToPerform = CommandLineManager.splitMultipleArguments((String) clm.getArguments().get(CommandLineOption.analysis.name()));
