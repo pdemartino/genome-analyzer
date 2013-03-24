@@ -1,8 +1,7 @@
 package com.dmp.signalanalyzer.apps.commandline;
 
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -11,9 +10,9 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-
+   
 public class CommandLineManager {
-
+   private static String multipleValuesSeparator = ",";
    private static CommandLineManager singleton = null;
    private Map<String, Object> arguments = null;
 
@@ -37,7 +36,13 @@ public class CommandLineManager {
       for (CommandLineOption option : CommandLineOption.values()) {
          System.out.println("Checking for " + option.name());
          if (cmLine.hasOption(option.name())) {
-            arguments.put(option.name(), cmLine.getOptionValue(option.name()));
+            arguments.put(option.name(), 
+                    cmLine.getOptionValue(option.name()).contains(multipleValuesSeparator)
+                    ? Arrays.asList(cmLine.getOptionValue(option.name()).split(multipleValuesSeparator))
+                    : cmLine.getOptionValue(option.name())              
+                    );
+            // override property
+            if (cm)
          }
       }
    }
@@ -87,9 +92,5 @@ public class CommandLineManager {
 
       return outArray;
    }
-   
-   public static String[] splitMultipleArguments(String optionValue){
-      String separator = " ";
-      return optionValue.split(separator);
-   }
+  
 }

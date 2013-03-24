@@ -22,6 +22,7 @@ import com.dmp.signalanalyzer.signal.SignalStats;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 
@@ -91,10 +92,10 @@ public class Main {
       filterConfiguration.set("normalizeUsingPosition", Boolean.valueOf(configurationManager.isNormalizeUsingPosition()));
 
       //  start analysing signal
-      String[] analysisToPerform = CommandLineManager.splitMultipleArguments((String) clm.getArguments().get(CommandLineOption.analysis.name()));
+      List<String> analysisToPerform = (List<String>) clm.getArguments().get(CommandLineOption.analysis.name());
       SignalFilter sa = null;
       Signal outSignal;
-      String outPutDirectory = ((String) clm.getArguments().get(CommandLineOption.outputdirectory.name()));
+      String outPutDirectory = ((String) clm.getArguments().get(CommandLineOption.outputDirectory.name()));
       if (!outPutDirectory.endsWith(File.separator)) {
          outPutDirectory += File.separator;
       }
@@ -207,7 +208,7 @@ public class Main {
    }
 
    private static void checkOutputDirectory() {
-      File fp = new File((String) clm.getArguments().get(CommandLineOption.outputdirectory.name()));
+      File fp = new File((String) clm.getArguments().get(CommandLineOption.outputDirectory.name()));
       if (!fp.isDirectory()) {
          fp.mkdirs();
       }
