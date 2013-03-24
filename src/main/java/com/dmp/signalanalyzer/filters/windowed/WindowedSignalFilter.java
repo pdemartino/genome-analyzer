@@ -1,6 +1,6 @@
 package com.dmp.signalanalyzer.filters.windowed;
 
-import com.dmp.signalanalyzer.configuration.ConfigurationManager;
+
 import com.dmp.signalanalyzer.filters.SignalFilter;
 import com.dmp.signalanalyzer.signal.Signal;
 import com.dmp.signalanalyzer.utils.SAMath;
@@ -10,16 +10,17 @@ import com.dmp.signalanalyzer.utils.SAMath;
  * @author Pasquale De Martino <paco.dmp@gmail.com>
  */
 public abstract class WindowedSignalFilter extends SignalFilter {
+   public static Double windowMultiplier = 0.05;
+   public static Double stepMultiplier = 0.5;
 
     public Signal filter(Signal inputSignal) {
-        ConfigurationManager configurationManager = ConfigurationManager.getInstance();
         double winSize = filterConfiguration.get("window") != null
-                ? ((Double) filterConfiguration.get("window")).intValue()
-                : (double) ((inputSignal.getTStop() + inputSignal.getTStart()) / 2 * configurationManager.getWindowsMultiplier());
+                ? ((Double) filterConfiguration.get("window"))
+                : (double) ((inputSignal.getTStop() + inputSignal.getTStart()) / 2 * windowMultiplier);
 
         double stSize = filterConfiguration.get("step") != null
-                ? ((Double) filterConfiguration.get("step")).intValue()
-                : (double) (winSize * configurationManager.getStepMultiplier());
+                ? ((Double) filterConfiguration.get("step"))
+                : (double) (winSize * stepMultiplier);
 
 
         Signal windowedSignal = inputSignal.applySlidingWindow(winSize,stSize);

@@ -1,10 +1,11 @@
 package com.dmp.signalanalyzer.apps;
 
-import com.dmp.signalanalyzer.apps.commandline.CommandLineManager;
+import com.dmp.signalanalyzer.apps.commandline.ConfigurationManager;
 import com.dmp.signalanalyzer.apps.commandline.CommandLineOption;
+import com.dmp.signalanalyzer.apps.commandline.PropertiesEnum;
 import com.dmp.signalanalyzer.apps.io.InputFilesLoader;
-import com.dmp.signalanalyzer.apps.io.SignalIoManager;
-import com.dmp.signalanalyzer.configuration.ConfigurationManager;
+import com.dmp.signalanalyzer.apps.io.OutputManager;
+import com.dmp.signalanalyzer.apps.logic.FilterRunner;
 import com.dmp.signalanalyzer.exceptions.SignalLengthMismatch;
 import com.dmp.signalanalyzer.filters.CompositeFilter;
 import com.dmp.signalanalyzer.filters.FilterConfiguration;
@@ -18,7 +19,6 @@ import com.dmp.signalanalyzer.filters.windowed.WindowedMedianAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedNinetiethPercentileAnalysis;
 import com.dmp.signalanalyzer.signal.RecombinationMap;
 import com.dmp.signalanalyzer.signal.Signal;
-import com.dmp.signalanalyzer.signal.SignalStats;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,35 +32,22 @@ import org.apache.log4j.Logger;
  */
 public class Main {
 
-   static CommandLineManager clm;
+   static OutputManager outputManager = new OutputManager();
    static ConfigurationManager configurationManager;
    static Signal inputSignal;
    static RecombinationMap recombinationMap;
    static final Logger logger = Logger.getLogger(Main.class.getName());
 
    public static void main(String[] args) {
-      clm = CommandLineManager.getInstance();
-      configurationManager = ConfigurationManager.getInstance();
 
       try {
-         clm.parseCommandLine(args);
+         loadConfiguration(args);
          loadInputSignal();
-         if (clm.getArguments().containsKey(CommandLineOption.stats.name())) {
-            SignalStats stats = inputSignal.getStatistics();
-            System.out.println(stats);
-            System.exit(0);
-         }
 
-         if (clm.getArguments().containsKey(CommandLineOption.recombinationMap.name())) {
-            loadRecombinationMap();
-            inputSignal = recombinationMap.applyRecombinationMap(inputSignal);
-         }
-
-         checkOutputDirectory();
          runAnalysis();
       } catch (ParseException ex) {
          logger.error(ex.getMessage());
-         CommandLineManager.printHelp();
+         ConfigurationManager.printHelp();
       } catch (IOException ex) {
          logger.error(String.format("Error on filesystem operation: ", ex.getMessage()));
       } catch (SignalLengthMismatch ex) {
@@ -69,153 +56,115 @@ public class Main {
 
    }
 
-   private static void runAnalysis() throws FileNotFoundException, SignalLengthMismatch, IOException {
-      FilterConfiguration filterConfiguration = new FilterConfiguration();
-      NinetiethPercentSelector ninetiethPercSelector = new NinetiethPercentSelector();
+   private static void loadConfiguration(String[] args) throws ParseException {
+      configurationManager = ConfigurationManager.getInstance();
+      configurationManager.parseCommandLine(args);
 
-      //  compute step and window for windowed analysis
-      double windowMultiplier = configurationManager.getWindowsMultiplier();
-      double window = inputSignal.getTStop() * windowMultiplier;
-
-      double stepMultiplier = configurationManager.getStepMultiplier();
-      double step = window * stepMultiplier;
-
-      filterConfiguration.set("window", Double.valueOf(window));
-      filterConfiguration.set("step", Double.valueOf(step));
-
-      if (clm.getArguments().containsKey(CommandLineOption.smoothingFactor.name())) {
-         filterConfiguration.set("smoothingFactor", Float.valueOf((String) clm.getArguments().get(CommandLineOption.smoothingFactor.name())));
-      } else {
-         filterConfiguration.set("smoothingFactor", Float.valueOf(configurationManager.getSmoothingFactor()));
-      }
-      
-      filterConfiguration.set("normalizeUsingPosition", Boolean.valueOf(configurationManager.isNormalizeUsingPosition()));
-
-      //  start analysing signal
-      List<String> analysisToPerform = (List<String>) clm.getArguments().get(CommandLineOption.analysis.name());
-      SignalFilter sa = null;
-      Signal outSignal;
-      String outPutDirectory = ((String) clm.getArguments().get(CommandLineOption.outputDirectory.name()));
-      if (!outPutDirectory.endsWith(File.separator)) {
-         outPutDirectory += File.separator;
-      }
-
-      // Saving input data
-      SignalIoManager.writeToFile(inputSignal, recombinationMap, outPutDirectory, "inputSignal", "");
-      for (String analysis : analysisToPerform) {
-         boolean isWindowed = false;
-         String fileNameAppend = "";
-
-         //[winmean winmedian winmax win90perc lowpass highpass unbias composite]
-         analysis = analysis.toLowerCase();
-         if (analysis.startsWith("lowpass")) {
-            sa = new LowPass();
-            fileNameAppend = retrieveFilterConfigurationByName(analysis, filterConfiguration);
-         } else if (analysis.startsWith("highpass")) {
-            sa = new HighPassFilter();
-         } else if (analysis.startsWith("unbias")) {
-            sa = new UnbiasFilter();
-         } else if (analysis.startsWith("composite")) {
-            sa = new CompositeFilter();
-            fileNameAppend = retrieveFilterConfigurationByName(analysis, filterConfiguration);
-         } else if (analysis.startsWith("winmean")) {
-            isWindowed = true;
-            sa = new WindowedMeanAnalysis();
-         } else if (analysis.startsWith("winmedian")) {
-            isWindowed = true;
-            sa = new WindowedMedianAnalysis();
-         } else if (analysis.startsWith("win90perc")) {
-            isWindowed = true;
-            sa = new WindowedNinetiethPercentileAnalysis();
-         } else {
-            continue; // skip wrong requests
-         }
-         sa.setFilterConfiguration(filterConfiguration);
-         logger.debug(String.format("Running %s with configuration: %s", sa.getName(), sa.getFilterConfiguration()));
-         outSignal = sa.filter(inputSignal);
-
-         logger.debug(String.format("%s analysis generated a signal %s items long, writing it to file...", sa.getName(), outSignal.count()));
-         SignalIoManager.writeToFile(outSignal, recombinationMap, outPutDirectory, sa.getName(), fileNameAppend);
-         if (isWindowed){
-            SignalIoManager.writeToFile(outSignal.flat(), recombinationMap, outPutDirectory, sa.getName() + "_flat", fileNameAppend);
-         }
-
-         // Mark Selected 
-         Signal selected = ninetiethPercSelector.filter(outSignal);
-         SignalIoManager.writeToFile(selected, recombinationMap, outPutDirectory, sa.getName() + "-SELECTED", fileNameAppend);
-
-         // try to free up some memory calling the garbage collector
-         outSignal = null;
-         System.gc();
-      }
+      outputManager.setDirectory((String) configurationManager.getConfigurationValue(PropertiesEnum.outputDirectory.name()));
+      outputManager.setValueSeparator((String) configurationManager.getConfigurationValue(PropertiesEnum.outputFileSeparator.name()));
+      outputManager.setFileExtension((String) configurationManager.getConfigurationValue(PropertiesEnum.outputFileExtension.name()));
 
    }
 
-   private static String retrieveFilterConfigurationByName(String name, FilterConfiguration ioConfiguration) {
-      String fileNameAppend = "";
-      if (name.contains("backward")) {
-         ioConfiguration.set("backward", Boolean.TRUE);
-         fileNameAppend += "Backward";
-      } else {
-         ioConfiguration.set("backward", Boolean.FALSE);
-      }
-      if (name.contains("twoway")) {
-         ioConfiguration.set("twoWay", Boolean.TRUE);
-         fileNameAppend += "TwoWay";
-      } else {
-         ioConfiguration.set("twoWay", Boolean.FALSE);
+   private static FilterConfiguration loadFilterConfiguration() {
+      FilterConfiguration filterConfiguration = new FilterConfiguration();
+
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
+         filterConfiguration.set(PropertiesEnum.normalizeUsingPosition.name(),
+                 configurationManager.getConfigurationValue(PropertiesEnum.normalizeUsingPosition.name()));
       }
 
-      if (name.contains("positionadapted")) {
-         ioConfiguration.set("normalizeUsingPosition", Boolean.TRUE);
-         fileNameAppend += "PositionAdapted";
-      } else {
-         ioConfiguration.set("normalizeUsingPosition", Boolean.FALSE);
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
+         filterConfiguration.set(PropertiesEnum.smoothingFactor.name(),
+                 configurationManager.getConfigurationValue(PropertiesEnum.smoothingFactor.name()));
       }
-      return fileNameAppend;
+
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
+         filterConfiguration.set(PropertiesEnum.stepSize.name(),
+                 configurationManager.getConfigurationValue(PropertiesEnum.stepSize.name()));
+      }
+
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
+         filterConfiguration.set(PropertiesEnum.windowsSize.name(),
+                 configurationManager.getConfigurationValue(PropertiesEnum.windowsSize.name()));
+      }
+
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
+         filterConfiguration.set(PropertiesEnum.backward.name(),
+                 configurationManager.getConfigurationValue(PropertiesEnum.backward.name()));
+      }
+
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
+         filterConfiguration.set(PropertiesEnum.twoWay.name(),
+                 configurationManager.getConfigurationValue(PropertiesEnum.twoWay.name()));
+      }
+
+      logger.info("Running analysis with the following configuration: \n" + filterConfiguration);
+      return filterConfiguration;
+
+   }
+
+   private static void runAnalysis() throws FileNotFoundException, SignalLengthMismatch, IOException {
+      FilterRunner filterRunner = new FilterRunner();
+      filterRunner.setFilterConfiguration(loadFilterConfiguration());
+
+
+      //  start analysing signal
+      List<String> analysisToPerform = (List<String>) configurationManager.getConfigurationValue(CommandLineOption.analysis.name());
+
+      for (String analysis : analysisToPerform) {
+         logger.info("Running filter " + analysis +"...");
+         Signal outSignal = filterRunner.run(inputSignal, analysis);
+         outputManager.writeToFile(outSignal, analysis, false);
+         outSignal = filterRunner.parseSelected(outSignal);
+         outputManager.writeToFile(outSignal, analysis, true);
+      }
+
    }
 
    private static void loadInputSignal() throws FileNotFoundException, IOException, SignalLengthMismatch {
       logger.debug("Loading input signal...");
       inputSignal = new Signal();
 
-      if (clm.getArguments().containsKey(CommandLineOption.lowerBound.name())) {
-         inputSignal.setLowerBound(Double.valueOf((String) clm.getArguments().get(CommandLineOption.lowerBound.name())));
+      Double lowerBound = (Double) configurationManager.getConfigurationValue(CommandLineOption.lowerBound.name());
+      if (lowerBound != null) {
+         inputSignal.setLowerBound(lowerBound);
+      }
+      Double upperBound = (Double) configurationManager.getConfigurationValue(CommandLineOption.upperBound.name());
+      if (upperBound != null) {
+         inputSignal.setUpperBound(upperBound);
       }
 
-      if (clm.getArguments().containsKey(CommandLineOption.upperBound.name())) {
-         inputSignal.setUpperBound(Double.valueOf((String) clm.getArguments().get(CommandLineOption.upperBound.name())));
-      }
-
-      Object[] signalArguments = CommandLineManager.splitFileNameAndColumn((String) clm.getArguments().get(CommandLineOption.signal.name()));
+      Object[] signalArguments = ConfigurationManager.splitFileNameAndColumn(configurationManager.getConfigurationValue(CommandLineOption.signal.name()).toString());
       String signalValuesFileName = (String) signalArguments[0];
       Integer signalValuesColumn = (Integer) signalArguments[1];
-      logger.debug(String.format("Loading signal values from %s from column %s (ColSeparator: %s)", signalValuesFileName, signalValuesColumn, configurationManager.getInputFileSeparator()));
-      Double[] signalArray = InputFilesLoader.csvToDoubleArray(signalValuesFileName, signalValuesColumn.intValue(), configurationManager.getInputFileSeparator(), clm.getArguments().containsKey(CommandLineOption.skipHeader.name()));
+      String inputFileSeparator = (String) configurationManager.getConfigurationValue(PropertiesEnum.inputFileSeparator.name());
+      Boolean skipInputHeader = Boolean.valueOf((String) configurationManager.getConfigurationValue(PropertiesEnum.skipInputHeader.name()));
+      logger.debug(String.format("Loading signal values from %s from column %s (ColSeparator: %s)", signalValuesFileName, signalValuesColumn, inputFileSeparator));
+      Double[] signalArray = InputFilesLoader.csvToDoubleArray(signalValuesFileName, signalValuesColumn.intValue(), inputFileSeparator, skipInputHeader);
 
 
-      if (clm.getArguments().containsKey(CommandLineOption.positions.name())) {
-         Object[] positionArguments = CommandLineManager.splitFileNameAndColumn((String) clm.getArguments().get(CommandLineOption.positions.name()));
+      if (configurationManager.hasConfigurationValue(CommandLineOption.positions.name())) {
+         Object[] positionArguments = ConfigurationManager.splitFileNameAndColumn((String) configurationManager.getConfigurationValue(CommandLineOption.positions.name()));
          String positionsFileName = (String) positionArguments[0];
          Integer positionsColumn = (Integer) positionArguments[1];
-         logger.debug(String.format("Loading positions from %s from column %s (ColSeparator: %s)", positionsFileName, positionsColumn, configurationManager.getInputFileSeparator()));
-         Double[] positionsArray = InputFilesLoader.csvToDoubleArray(positionsFileName, positionsColumn, configurationManager.getInputFileSeparator(), clm.getArguments().containsKey(CommandLineOption.skipHeader.name()));
+         logger.debug(String.format("Loading positions from %s from column %s (ColSeparator: %s)", positionsFileName, positionsColumn, inputFileSeparator));
+         Double[] positionsArray = InputFilesLoader.csvToDoubleArray(positionsFileName, positionsColumn, inputFileSeparator, skipInputHeader);
          inputSignal.addComponentsArray(signalArray, positionsArray);
       } else {
          inputSignal.addComponentsArray(signalArray);
       }
       logger.debug(String.format("Loaded a signal %s items long", inputSignal.count()));
-   }
 
-   private static void checkOutputDirectory() {
-      File fp = new File((String) clm.getArguments().get(CommandLineOption.outputDirectory.name()));
-      if (!fp.isDirectory()) {
-         fp.mkdirs();
+      if (configurationManager.hasConfigurationValue(CommandLineOption.recombinationMap.name())) {
+         loadRecombinationMap(inputFileSeparator, skipInputHeader);
+         inputSignal = recombinationMap.applyRecombinationMap(inputSignal);
+         outputManager.setRecombinationMap(recombinationMap);
       }
    }
 
-   private static void loadRecombinationMap() throws IOException, SignalLengthMismatch {
-      String recombinationMapCommand = (String) clm.getArguments().get(CommandLineOption.recombinationMap.name());
+   private static void loadRecombinationMap(String inputFileSeparator, Boolean skipInputHeader) throws IOException, SignalLengthMismatch {
+      String recombinationMapCommand = (String) configurationManager.getConfigurationValue(CommandLineOption.recombinationMap.name());
       String[] recombinationParameters = recombinationMapCommand.split(":");
 
       if (recombinationParameters.length < 3) {
@@ -226,8 +175,8 @@ public class Main {
          int positionColumn = (new Integer(recombinationParameters[1])).intValue();
          int recombinationColumn = (new Integer(recombinationParameters[2])).intValue();
 
-         Double[] positionsArray = InputFilesLoader.csvToDoubleArray(filename, positionColumn, configurationManager.getInputFileSeparator(), clm.getArguments().containsKey(CommandLineOption.skipHeader.name()));
-         Double[] recombinationArray = InputFilesLoader.csvToDoubleArray(filename, recombinationColumn, configurationManager.getInputFileSeparator(), clm.getArguments().containsKey(CommandLineOption.skipHeader.name()));
+         Double[] positionsArray = InputFilesLoader.csvToDoubleArray(filename, positionColumn, inputFileSeparator, skipInputHeader);
+         Double[] recombinationArray = InputFilesLoader.csvToDoubleArray(filename, recombinationColumn, inputFileSeparator, skipInputHeader);
 
          recombinationMap = new RecombinationMap(positionsArray, recombinationArray);
       }

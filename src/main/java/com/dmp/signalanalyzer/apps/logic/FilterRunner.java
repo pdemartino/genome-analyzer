@@ -24,10 +24,13 @@ public class FilterRunner {
          if (filterClass != null) {
             SignalFilter filterObject;
             try {
-               filterObject = (SignalFilter) Class.forName(filterClass.className).cast(SignalFilter.class);
+               logger.debug(String.format("Running %s in chain...",filter));
+               filterObject = (SignalFilter) filterClass.className.newInstance();
                filterObject.setFilterConfiguration(filterConfiguration);
                outSignal = filterObject.filter(outSignal != null ? outSignal : inputSignal);
-            } catch (ClassNotFoundException ex) {
+            } catch (InstantiationException ex) {
+               notifyUnExistingFilter(filter);
+            } catch (IllegalAccessException ex) {
                notifyUnExistingFilter(filter);
             }
          }else{

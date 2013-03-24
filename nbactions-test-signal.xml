@@ -7,10 +7,10 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xmx1024m -classpath %classpath com.dmp.signalanalyzer.apps.Main -signal composite\inputSignal_20130302.csv:3 -positions composite\inputSignal_20130302.csv:0 -outputdirectory ./composite/bias -analysis  unbias -skipHeader</exec.args>
+                <exec.args>-Xmx1024m -classpath %classpath com.dmp.signalanalyzer.apps.Main -signal ./fst/fst.out:0 -positions loci-positions.txt:0 -outputDirectory /tmp/sa -analysis  unbias-lowpass,winNinetiethPerc</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.workingdir>C:\Users\Paco\Dropbox\Documenti\Tesi_Policlinico\Tesi\lyx-tesi\populations\simupop\10M_loci-6_gen</exec.workingdir>
+                <exec.workingdir>/home/pdemartino/dev/tesi/populations/simu_dim10000_gen3_fit01</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -20,11 +20,11 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xmx1024m -classpath %classpath com.dmp.signalanalyzer.apps.Main -signal composite\inputSignal_20130302.csv:3 -positions composite\inputSignal_20130302.csv:0 -outputdirectory ./composite/bias -analysis  unbias -skipHeader</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xmx1024m -classpath %classpath com.dmp.signalanalyzer.apps.Main -signal ./fst/fst.out:0 -positions loci-positions.txt:0 -outputDirectory /tmp/sa -analysis  unbias-lowpass,winNinetiethPerc</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.classpathScope>runtime</exec.classpathScope>
                 <jpda.listen>true</jpda.listen>
-                <exec.workingdir>C:\Users\Paco\Dropbox\Documenti\Tesi_Policlinico\Tesi\lyx-tesi\populations\simupop\10M_loci-6_gen</exec.workingdir>
+                <exec.workingdir>/home/pdemartino/dev/tesi/populations/simu_dim10000_gen3_fit01</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -34,9 +34,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>${profiler.args} -Xmx1024m -classpath %classpath com.dmp.signalanalyzer.apps.Main -signal composite\inputSignal_20130302.csv:3 -positions composite\inputSignal_20130302.csv:0 -outputdirectory ./composite/bias -analysis  unbias -skipHeader</exec.args>
+                <exec.args>${profiler.args} -Xmx1024m -classpath %classpath com.dmp.signalanalyzer.apps.Main -signal ./fst/fst.out:0 -positions loci-positions.txt:0 -outputDirectory /tmp/sa -analysis  unbias-lowpass,winNinetiethPerc</exec.args>
                 <exec.executable>${profiler.java}</exec.executable>
-                <exec.workingdir>C:\Users\Paco\Dropbox\Documenti\Tesi_Policlinico\Tesi\lyx-tesi\populations\simupop\10M_loci-6_gen</exec.workingdir>
+                <exec.workingdir>/home/pdemartino/dev/tesi/populations/simu_dim10000_gen3_fit01</exec.workingdir>
             </properties>
         </action>
     </actions>

@@ -95,19 +95,19 @@ public class LowPass extends SignalFilter {
    private void refreshConfiguration() {
 
       if (filterConfiguration.get("normalizeUsingPosition") != null) {
-         normalizeUsingPosition = (Boolean) this.filterConfiguration.get("normalizeUsingPosition");
+         normalizeUsingPosition = Boolean.valueOf((String)this.filterConfiguration.get("normalizeUsingPosition"));
       }
 
       if (this.filterConfiguration.get("backward") != null) {
-         backward = (Boolean) this.filterConfiguration.get("backward");
+         backward = Boolean.valueOf((String)this.filterConfiguration.get("backward"));
       }
 
       if (this.filterConfiguration.get("smoothingFactor") != null) {
-         smoothingFactor = (Float) this.filterConfiguration.get("smoothingFactor");
+         smoothingFactor = Float.valueOf((String)this.filterConfiguration.get("smoothingFactor"));
       }
 
       if (this.filterConfiguration.get("twoWay") != null) {
-         twoWay = (Boolean) this.filterConfiguration.get("twoWay");
+         twoWay = Boolean.valueOf((String)this.filterConfiguration.get("twoWay"));
       }
    }
 
