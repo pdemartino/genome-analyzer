@@ -38,7 +38,7 @@ public abstract class WindowedSignalFilter extends SignalFilter {
             }
             window.setValue(winValue);
         }
-        return windowedSignal.flat();
+        return windowedSignal;
     }
 
     private static double[] getMinMaxComponentsCount(Signal signal) {

@@ -102,6 +102,7 @@ public class Main {
       // Saving input data
       SignalIoManager.writeToFile(inputSignal, recombinationMap, outPutDirectory, "inputSignal", "");
       for (String analysis : analysisToPerform) {
+         boolean isWindowed = false;
          String fileNameAppend = "";
 
          //[winmean winmedian winmax win90perc lowpass highpass unbias composite]
@@ -117,10 +118,13 @@ public class Main {
             sa = new CompositeFilter();
             fileNameAppend = retrieveFilterConfigurationByName(analysis, filterConfiguration);
          } else if (analysis.startsWith("winmean")) {
+            isWindowed = true;
             sa = new WindowedMeanAnalysis();
          } else if (analysis.startsWith("winmedian")) {
+            isWindowed = true;
             sa = new WindowedMedianAnalysis();
          } else if (analysis.startsWith("win90perc")) {
+            isWindowed = true;
             sa = new WindowedNinetiethPercentileAnalysis();
          } else {
             continue; // skip wrong requests
@@ -131,6 +135,9 @@ public class Main {
 
          logger.debug(String.format("%s analysis generated a signal %s items long, writing it to file...", sa.getName(), outSignal.count()));
          SignalIoManager.writeToFile(outSignal, recombinationMap, outPutDirectory, sa.getName(), fileNameAppend);
+         if (isWindowed){
+            SignalIoManager.writeToFile(outSignal.flat(), recombinationMap, outPutDirectory, sa.getName() + "_flat", fileNameAppend);
+         }
 
          // Mark Selected 
          Signal selected = ninetiethPercSelector.filter(outSignal);
