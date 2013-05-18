@@ -22,7 +22,7 @@ public enum CommandLineOption {
    "File containing signal values as a column (use '.' (dot) as decimal separator)",
    null),
    recombinationMap(false, 1, 1,
-   "recombination-map_filename:position:genetic-map",
+   "map_file:hisical_col:genetic_col",
    "File containing mapping between physical and genetic positions",
    null),
    outputDirectory(false, 1, 1,
@@ -44,7 +44,7 @@ public enum CommandLineOption {
    null),
    
    lowerBound(false, 1, 1,
-   "lowe_bound",
+   "lower_bound",
    "Consider only values with time/position >= lowerBound",
    null),
    upperBound(false, 1, 1,
@@ -54,11 +54,7 @@ public enum CommandLineOption {
    skipInputHeader(false, 0, 0,
    " ",
    "Skip header from ALL input csv",
-   "skipInputHeader"),
-   smoothingFactor(false, 1, 1,
-   "smoothingFactor",
-   "low pass analysis smoothing factor (float)",
-   "smoothingFactor");
+   "skipInputHeader");
    private boolean mandatory = false;
    private int maxNumOfArguments = 0;
    private int minNumOfArguments = 0;
