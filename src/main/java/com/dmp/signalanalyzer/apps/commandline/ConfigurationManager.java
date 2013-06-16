@@ -47,15 +47,22 @@ public class ConfigurationManager {
          System.out.println("Checking for " + option.name());
          if (cmLine.hasOption(option.name())) {
             String name = option.name();
-            Object value = cmLine.getOptionValue(name).contains(multipleValuesSeparator)
-                    ? Arrays.asList(cmLine.getOptionValue(name).split(multipleValuesSeparator))
-                    : cmLine.getOptionValue(name);
+            Object value;
+            if (option.hasArguments()) {
+               value =
+                       cmLine.getOptionValue(name).contains(multipleValuesSeparator) || option.getMaxNumOfArguments() > 1
+                       ? Arrays.asList(cmLine.getOptionValue(name).split(multipleValuesSeparator))
+                       : cmLine.getOptionValue(name);
 
+            } else {
+               value = "true";
+            }
             configurationParameters.put(name, value);
             // override property
             if (option.hasPropertyToOverride()) {
                System.setProperty(option.getPropertyToOverride(), value.toString());
             }
+
          }
       }
    }

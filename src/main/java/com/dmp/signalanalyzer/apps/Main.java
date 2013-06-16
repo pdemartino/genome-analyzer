@@ -108,6 +108,7 @@ public class Main {
          outputManager.writeToFile(outSignal, analysis, false);
          outSignal = filterRunner.parseSelected(outSignal);
          outputManager.writeToFile(outSignal, analysis, true);
+         outputManager.writeSelectedRegions(outSignal, analysis);
       }
 
    }

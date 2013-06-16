@@ -1,7 +1,6 @@
 package com.dmp.signalanalyzer.apps.commandline;
 
 import com.dmp.signalanalyzer.apps.logic.Filter;
-import com.dmp.signalanalyzer.apps.logic.FilterRunner;
 
 /**
  *
@@ -29,7 +28,6 @@ public enum CommandLineOption {
    "output_directory",
    "Directory where to put analysis files (one for each analysis)",
    "outputDirectory"),
-   
    analysis(true, 1, Integer.MAX_VALUE,
    "analysis",
    String.format(
@@ -42,7 +40,6 @@ public enum CommandLineOption {
    Filter.CHAIN_SEPARATOR, Filter.values()[0], Filter.CHAIN_SEPARATOR, Filter.values()[1],
    Filter.values()[0], Filter.values()[1], Filter.values()[0]),
    null),
-   
    lowerBound(false, 1, 1,
    "lower_bound",
    "Consider only values with time/position >= lowerBound",
@@ -54,7 +51,12 @@ public enum CommandLineOption {
    skipInputHeader(false, 0, 0,
    " ",
    "Skip header from ALL input csv",
-   "skipInputHeader");
+   "skipInputHeader"),
+   inputFileSeparator(false, 1, 1,
+   "input_file_separator",
+   "String used to separate columns inside input file",
+   "inputFileSeparator");
+   
    private boolean mandatory = false;
    private int maxNumOfArguments = 0;
    private int minNumOfArguments = 0;

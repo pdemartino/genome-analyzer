@@ -67,6 +67,67 @@ public class OutputManager {
       fwr.close();
    }
 
+   public void writeSelectedRegions(Signal signal, String filter) throws IOException {
+      String filename = "regions." + fileExtension;
+      filename = casDirectory(filter) + File.separator + filename;
+      logger.info(String.format("Writing %s...", filename));
+      BufferedWriter fileWriter = new BufferedWriter(new FileWriter(filename));
+      String line =
+              "Region"
+              + valueSeparator + "Start"
+              + valueSeparator + "Stop"
+              + valueSeparator + "Center"
+              + valueSeparator + "Size(bases)"
+              + valueSeparator + "SNPs"
+              + valueSeparator + "Mean";
+      fileWriter.write(line);
+      fileWriter.newLine();
+
+
+
+      Double start = null;
+      Double stop = null;
+      double sum = 0.;
+      int count = 0;
+      Double prevPos = null;
+      int index = 0;
+      for (Signal component : signal) {
+         if (component.getValue() > 0) {
+            if (start == null) {
+               index++;
+               start = component.getTime();
+            }
+            sum += component.getValue();
+            count++;
+            prevPos = component.getTime();
+         } else {
+            if (start != null) {
+               stop = prevPos;
+               double mean = sum / count;
+
+               line =
+                       index
+                       + valueSeparator + start
+                       + valueSeparator + stop
+                       + valueSeparator + ((stop + start)/2)
+                       + valueSeparator + ((stop - start))
+                       + valueSeparator + count
+                       + valueSeparator + mean;
+               fileWriter.write(line);
+               fileWriter.newLine();
+
+               start = null;
+               stop = null;
+               count = 0;
+               sum = 0;
+               prevPos = null;
+            }
+         }
+      }
+
+      fileWriter.close();
+   }
+
    private String getFilePath(String filter, boolean selected) {
       String finalDirectory = casDirectory(filter);
       if (finalDirectory != null) {
@@ -115,8 +176,6 @@ public class OutputManager {
    public void setFileExtension(String fileExtension) {
       this.fileExtension = fileExtension;
    }
-   
-   
 
    public void setAppendDate(Boolean appendDate) {
       this.appendDate = appendDate;
@@ -130,7 +189,7 @@ public class OutputManager {
                  sdf.format(cal.getTime()));
       }
       File directoryObj = new File(finalDirectory);
-      if (directoryObj.isDirectory() || directoryObj.mkdirs()){
+      if (directoryObj.isDirectory() || directoryObj.mkdirs()) {
          return finalDirectory;
       }
       return null;
