@@ -28,7 +28,7 @@ public class Signal implements Iterable<Signal> {
       this();
       this.tStart = tStart;
       this.tStop = tStop;
-      this.value = value;
+      this.value = Math.max(value,0);
    }
 
    public Signal(Double time, Double value) {
