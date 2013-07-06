@@ -1,5 +1,6 @@
-package com.dmp.signalanalyzer.filters;
+package com.dmp.signalanalyzer.filters.smoothing;
 
+import com.dmp.signalanalyzer.filters.SignalFilter;
 import com.dmp.signalanalyzer.signal.Signal;
 
 /**
