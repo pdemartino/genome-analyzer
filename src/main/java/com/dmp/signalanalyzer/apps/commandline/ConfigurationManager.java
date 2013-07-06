@@ -44,13 +44,12 @@ public class ConfigurationManager {
       this.configurationParameters = new HashMap<String, Object>();
 
       for (CommandLineOption option : CommandLineOption.values()) {
-         System.out.println("Checking for " + option.name());
          if (cmLine.hasOption(option.name())) {
             String name = option.name();
             Object value;
             if (option.hasArguments()) {
                value =
-                       cmLine.getOptionValue(name).contains(multipleValuesSeparator) || option.getMaxNumOfArguments() > 1
+                       cmLine.getOptionValue(name).contains(multipleValuesSeparator) && option.getMaxNumOfArguments() > 1
                        ? Arrays.asList(cmLine.getOptionValue(name).split(multipleValuesSeparator))
                        : cmLine.getOptionValue(name);
 
@@ -62,7 +61,7 @@ public class ConfigurationManager {
             if (option.hasPropertyToOverride()) {
                System.setProperty(option.getPropertyToOverride(), value.toString());
             }
-
+            System.out.println(String.format("%s set to %s", name, value ));
          }
       }
    }
