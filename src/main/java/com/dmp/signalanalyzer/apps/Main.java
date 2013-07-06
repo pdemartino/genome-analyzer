@@ -6,6 +6,7 @@ import com.dmp.signalanalyzer.apps.commandline.PropertiesEnum;
 import com.dmp.signalanalyzer.apps.io.InputFilesLoader;
 import com.dmp.signalanalyzer.apps.io.OutputManager;
 import com.dmp.signalanalyzer.apps.logic.FilterRunner;
+import com.dmp.signalanalyzer.exceptions.InvalidInputException;
 import com.dmp.signalanalyzer.exceptions.SignalLengthMismatch;
 import com.dmp.signalanalyzer.filters.FilterConfiguration;
 import com.dmp.signalanalyzer.signal.RecombinationMap;
@@ -41,6 +42,8 @@ public class Main {
       } catch (IOException ex) {
          logger.error(String.format("Error on filesystem operation: ", ex.getMessage()));
       } catch (SignalLengthMismatch ex) {
+         logger.error(ex.getMessage());
+      }catch (InvalidInputException ex){
          logger.error(ex.getMessage());
       }
 
@@ -113,7 +116,7 @@ public class Main {
 
    }
 
-   private static void loadInputSignal() throws FileNotFoundException, IOException, SignalLengthMismatch {
+   private static void loadInputSignal() throws FileNotFoundException, IOException, SignalLengthMismatch, InvalidInputException {
       logger.debug("Loading input signal...");
       inputSignal = new Signal();
 
@@ -154,7 +157,7 @@ public class Main {
       }
    }
 
-   private static void loadRecombinationMap(String inputFileSeparator, Boolean skipInputHeader) throws IOException, SignalLengthMismatch {
+   private static void loadRecombinationMap(String inputFileSeparator, Boolean skipInputHeader) throws IOException, SignalLengthMismatch, FileNotFoundException, InvalidInputException {
       String recombinationMapCommand = (String) configurationManager.getConfigurationValue(CommandLineOption.recombinationMap.name());
       String[] recombinationParameters = recombinationMapCommand.split(":");
 
