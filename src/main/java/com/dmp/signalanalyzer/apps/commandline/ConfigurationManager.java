@@ -49,7 +49,7 @@ public class ConfigurationManager {
             Object value;
             if (option.hasArguments()) {
                value =
-                       cmLine.getOptionValue(name).contains(multipleValuesSeparator) && option.getMaxNumOfArguments() > 1
+                       option.getMaxNumOfArguments() > 1
                        ? Arrays.asList(cmLine.getOptionValue(name).split(multipleValuesSeparator))
                        : cmLine.getOptionValue(name);
 
