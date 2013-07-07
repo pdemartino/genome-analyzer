@@ -15,7 +15,7 @@ public class WindowedMedianAnalysis extends WindowedSignalFilter {
    
    public double getSingleWindowValue(Signal window) {
       percentile.setQuantile(quantile);
-      double percentileVal = percentile.evaluate(window.toDoubleValuesArray());
+      double percentileVal = percentile.evaluate(window.getY());
       return percentileVal;
    }
 

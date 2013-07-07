@@ -198,13 +198,22 @@ public class Signal implements Iterable<Signal> {
       this.value = wholeSignalValue;
    }
 
-   public double[] toDoubleValuesArray() {
-      double[] valuesArray = new double[this.components.size()];
+   public double[] getX() {
+      double[] x = new double[this.components.size()];
       int i = -1;
       for (Signal pulse : this) {
-         valuesArray[++i] = pulse.getValue();
+         x[++i] = pulse.getTime();
       }
-      return valuesArray;
+      return x;
+   }
+   
+   public double[] getY() {
+      double[] y = new double[this.components.size()];
+      int i = -1;
+      for (Signal pulse : this) {
+         y[++i] = pulse.getValue();
+      }
+      return y;
    }
 
    public Signal cloneAtLevel(int level) {

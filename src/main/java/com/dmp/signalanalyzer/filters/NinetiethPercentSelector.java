@@ -17,7 +17,7 @@ public class NinetiethPercentSelector extends SignalFilter {
       Signal filteredSignal = new Signal();
       // 1 compute 90°perc 
       percentile.setQuantile(quantile);
-      double percentileVal = percentile.evaluate(signal.toDoubleValuesArray());
+      double percentileVal = percentile.evaluate(signal.getY());
       
       // 2 select pulses >= 90° Perc
       double filteredValue = 0; //{0,1}

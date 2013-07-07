@@ -41,7 +41,7 @@ public class SignalStats {
          sumMethodValue += pulse.getValue();
       }
       
-      double[] dArray = signal.toDoubleValuesArray();
+      double[] dArray = signal.getY();
       percentile.setQuantile(50);
       this.medianValue = percentile.evaluate(dArray);
       
