@@ -6,6 +6,8 @@ package com.dmp.signalanalyzer.filters.smoothing;
 
 import com.dmp.signalanalyzer.filters.SignalFilter;
 import com.dmp.signalanalyzer.signal.Signal;
+import com.dmp.signalanalyzer.utils.SAMath;
+
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 
 /**
@@ -18,7 +20,7 @@ public class HoleFiller extends SignalFilter{
    @Override
    public Signal filter(Signal signal) {
       // For each null (zero) point, if the distance from the prevois one is 
-      // less then the 5%ile then change the value from zero to the average of 
+      // less then the average then change the value from zero to the average of 
       // the two points
       Signal filled = new Signal();
       
@@ -51,7 +53,7 @@ public class HoleFiller extends SignalFilter{
          distances[i-1] = positions[i] -  positions[i-1];
       }
       
-      return percentile.evaluate(distances);
+      return SAMath.average(positions);
    }
    
 }
