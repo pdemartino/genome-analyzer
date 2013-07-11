@@ -118,11 +118,11 @@ public class Main {
       logger.debug("Loading input signal...");
       inputSignal = new Signal();
 
-      Double lowerBound = (Double) configurationManager.getConfigurationValue(CommandLineOption.lowerBound.name());
+      Double lowerBound = Double.valueOf(configurationManager.getConfigurationValue(CommandLineOption.lowerBound.name()).toString());
       if (lowerBound != null) {
          inputSignal.setLowerBound(lowerBound);
       }
-      Double upperBound = (Double) configurationManager.getConfigurationValue(CommandLineOption.upperBound.name());
+      Double upperBound = Double.valueOf(configurationManager.getConfigurationValue(CommandLineOption.upperBound.name()).toString());
       if (upperBound != null) {
          inputSignal.setUpperBound(upperBound);
       }
