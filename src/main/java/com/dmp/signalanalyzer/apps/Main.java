@@ -118,15 +118,14 @@ public class Main {
       logger.debug("Loading input signal...");
       inputSignal = new Signal();
 
-      Double lowerBound = Double.valueOf(configurationManager.getConfigurationValue(CommandLineOption.lowerBound.name()).toString());
-      if (lowerBound != null) {
-         inputSignal.setLowerBound(lowerBound);
+      if (configurationManager.getConfigurationValue(CommandLineOption.lowerBound.name()) != null){
+    	  inputSignal.setLowerBound(Double.valueOf(configurationManager.getConfigurationValue(CommandLineOption.lowerBound.name()).toString())); 
       }
-      Double upperBound = Double.valueOf(configurationManager.getConfigurationValue(CommandLineOption.upperBound.name()).toString());
-      if (upperBound != null) {
-         inputSignal.setUpperBound(upperBound);
+      
+      if (configurationManager.getConfigurationValue(CommandLineOption.upperBound.name()) != null){
+    	  inputSignal.setUpperBound(Double.valueOf(configurationManager.getConfigurationValue(CommandLineOption.upperBound.name()).toString())); 
       }
-
+      
       Object[] signalArguments = ConfigurationManager.splitFileNameAndColumn(configurationManager.getConfigurationValue(CommandLineOption.signal.name()).toString());
       String signalValuesFileName = (String) signalArguments[0];
       Integer signalValuesColumn = (Integer) signalArguments[1];
