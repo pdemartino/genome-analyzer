@@ -109,8 +109,6 @@ public class Main {
          logger.info("Running filter " + analysis +"...");
          Signal outSignal = filterRunner.run(inputSignal, analysis);
          outputManager.writeToFile(outSignal, analysis, false);
-         //outSignal = filterRunner.parseSelected(outSignal);
-         //outputManager.writeToFile(outSignal, analysis, true);
          outputManager.writeSelectedRegions(outSignal, analysis);
       }
 

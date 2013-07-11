@@ -1,6 +1,5 @@
 package com.dmp.signalanalyzer.apps.io;
 
-import com.dmp.signalanalyzer.filters.SignalFilter;
 import com.dmp.signalanalyzer.signal.RecombinationMap;
 import com.dmp.signalanalyzer.signal.Signal;
 import java.io.BufferedWriter;
