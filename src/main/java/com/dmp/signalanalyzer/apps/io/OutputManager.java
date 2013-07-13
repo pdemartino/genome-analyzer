@@ -78,7 +78,8 @@ public class OutputManager {
               + valueSeparator + "Center"
               + valueSeparator + "Size(bases)"
               + valueSeparator + "SNPs"
-              + valueSeparator + "Mean";
+              + valueSeparator + "Mean"
+              + valueSeparator + "Max";
       fileWriter.write(line);
       fileWriter.newLine();
 
@@ -87,6 +88,7 @@ public class OutputManager {
       Double start = null;
       Double stop = null;
       double sum = 0.;
+      double max = 0.;
       int count = 0;
       Double prevPos = null;
       int index = 0;
@@ -97,6 +99,7 @@ public class OutputManager {
                start = component.getTime();
             }
             sum += component.getValue();
+            max = Math.max(max, component.getValue());
             count++;
             prevPos = component.getTime();
          } else {
@@ -111,7 +114,8 @@ public class OutputManager {
                        + valueSeparator + ((stop + start)/2)
                        + valueSeparator + ((stop - start))
                        + valueSeparator + count
-                       + valueSeparator + mean;
+                       + valueSeparator + mean
+                       + valueSeparator + max;
                fileWriter.write(line);
                fileWriter.newLine();
 
