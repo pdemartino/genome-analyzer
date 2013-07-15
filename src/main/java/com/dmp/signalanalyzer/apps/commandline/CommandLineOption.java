@@ -31,11 +31,11 @@ public enum CommandLineOption {
    analysis(true, 1, Integer.MAX_VALUE,
    "analysis",
    String.format(
-   "Analysis and filters to apply on signal: {%s}"
+   "Analysis and filters to apply on signal: {\n%s}"
    + "\n\tYou can run several analysis on the same input signal separating them with "
    + "%s (eg: %s%s%s)"
    + "\n\tYou can apply two or more analysis in chain separating them with %s "
-   + "(eg: %s%s%s will apply %s on the input signal and the %s filter on the %s output", Filter.implodeValues(","),
+   + "(eg: %s%s%s will apply %s on the input signal and the %s filter on the %s output", Filter.implodeValues("\n"),
    ConfigurationManager.multipleValuesSeparator, Filter.values()[0], ConfigurationManager.multipleValuesSeparator, Filter.values()[1],
    Filter.CHAIN_SEPARATOR, Filter.values()[0], Filter.CHAIN_SEPARATOR, Filter.values()[1],
    Filter.values()[0], Filter.values()[1], Filter.values()[0]),

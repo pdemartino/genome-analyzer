@@ -1,13 +1,12 @@
 package com.dmp.signalanalyzer.apps.logic;
 
 import com.dmp.signalanalyzer.filters.LowPass;
+import com.dmp.signalanalyzer.filters.NeutralFilter;
 import com.dmp.signalanalyzer.filters.NinetiethPercentSelector;
 import com.dmp.signalanalyzer.filters.UnbiasFilter;
-import com.dmp.signalanalyzer.filters.smoothing.MovingAvgFitting;
-import com.dmp.signalanalyzer.filters.NeutralFilter;
-import com.dmp.signalanalyzer.filters.smoothing.CubicSplineSmoothing;
 import com.dmp.signalanalyzer.filters.smoothing.HoleFiller;
-import com.dmp.signalanalyzer.filters.smoothing.LeastSquaresRegression;
+import com.dmp.signalanalyzer.filters.windowed.WindowedMeanAnalysis;
+import com.dmp.signalanalyzer.filters.windowed.WindowedMedianAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedNinetiethPercentileAnalysis;
 
 /**
@@ -16,15 +15,22 @@ import com.dmp.signalanalyzer.filters.windowed.WindowedNinetiethPercentileAnalys
  */
 public enum Filter {
 
+   
+   // smooting
    lowpass(LowPass.class),
+   // Component selection
    unbias(UnbiasFilter.class),
-   movingAvgFitting(MovingAvgFitting.class),
    ninetiethPercSelector(NinetiethPercentSelector.class),
-   neutral(NeutralFilter.class),
-   leastSquaresRegression(LeastSquaresRegression.class),
-   cubicSplineSmoothing(CubicSplineSmoothing.class),
+   
+   // Regions selector
+   holeFiller(HoleFiller.class),
+      
+   //Windowed
    winNinetiethPerc(WindowedNinetiethPercentileAnalysis.class),
-   holeFiller(HoleFiller.class);
+   winMean(WindowedMeanAnalysis.class),
+   winMedian(WindowedMedianAnalysis.class),
+		   
+   neutral(NeutralFilter.class);
    
    public static String CHAIN_SEPARATOR = "-";
    Class className;
