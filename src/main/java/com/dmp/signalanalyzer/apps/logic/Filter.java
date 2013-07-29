@@ -4,7 +4,7 @@ import com.dmp.signalanalyzer.filters.LowPass;
 import com.dmp.signalanalyzer.filters.NeutralFilter;
 import com.dmp.signalanalyzer.filters.NinetiethPercentSelector;
 import com.dmp.signalanalyzer.filters.UnbiasFilter;
-import com.dmp.signalanalyzer.filters.smoothing.HoleFiller;
+import com.dmp.signalanalyzer.filters.smoothing.HaplotypeDelimiter;
 import com.dmp.signalanalyzer.filters.windowed.WindowedMeanAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedMedianAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedNinetiethPercentileAnalysis;
@@ -23,7 +23,7 @@ public enum Filter {
    ninetiethPercSelector(NinetiethPercentSelector.class),
    
    // Regions selector
-   holeFiller(HoleFiller.class),
+   holeFiller(HaplotypeDelimiter.class),
       
    //Windowed
    winNinetiethPerc(WindowedNinetiethPercentileAnalysis.class),
