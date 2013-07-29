@@ -45,14 +45,16 @@ public class HaplotypeDelimiter extends SignalFilter{
       double maxValue = 0.0;
       for (Signal snp : filled){
          if (snp.getValue() > 0.0){
+            boolean add = false;
             if (haplotype == null){
                haplotype = new Signal();
-               haplotypes.addComponent(haplotype);
+               add = true;
             }
             // haplotype start and stop are automatically 
             // updated
             haplotype.addComponent(snp);
             maxValue = Math.max(maxValue, snp.getValue());
+            if (add){haplotypes.addComponent(haplotype);}
          }else{
             if (haplotype != null){
                haplotype.setValue(maxValue);

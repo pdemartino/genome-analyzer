@@ -2,6 +2,7 @@ package com.dmp.signalanalyzer.apps.io;
 
 import com.dmp.signalanalyzer.signal.RecombinationMap;
 import com.dmp.signalanalyzer.signal.Signal;
+import com.dmp.signalanalyzer.utils.SAMath;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -44,23 +45,24 @@ public class OutputManager {
       }
 
       // Print Header
+      fwr.write("Region");
+      fwr.write(separator + "Start");
+      fwr.write(separator + "Stop");
+      fwr.write(separator + "Mean");
+      fwr.write(separator + "Max");
 
-      fwr.write("Position");
-      if (recombinationMap != null) {
-         fwr.write(separator + "GeneticMap");
-      }
-      fwr.write(separator + "Value");
-
-
+      // values
+      int regionId = 0;
       for (Signal p : signal) {
          fwr.write(newLine);
-         if (recombinationMap != null) {
-            Double position = recombinationMap.getPosition(p.getTime());
-            fwr.write(position != null ? position.toString() : "");
-            fwr.write(separator);
-         }
-         fwr.write(String.valueOf(p.getTime()));
-         fwr.write(separator + String.valueOf(p.getValue()));
+         fwr.write(Integer.toString(++regionId));
+         fwr.write(separator + p.getTStart());
+         fwr.write(separator + p.getTStop());
+         
+         // Get values
+         double[] values = p.getY();
+         fwr.write(separator + Double.toString(SAMath.average(values)));
+         fwr.write(separator + Double.toString(SAMath.max(values)));
       }
       logger.debug(String.format("Written %s lines", signal.count()));
       fwr.close();

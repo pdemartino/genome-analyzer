@@ -30,7 +30,7 @@ public class SAMath {
       
       return count==0 ? 0 : sum / count;
    }
-   
+
    public static double min(double... values){
       double min = Double.MAX_VALUE;
       for (double value : values){
