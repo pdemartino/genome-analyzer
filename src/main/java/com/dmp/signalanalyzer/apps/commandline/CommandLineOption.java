@@ -55,7 +55,12 @@ public enum CommandLineOption {
    inputFileSeparator(false, 1, 1,
    "input_file_separator",
    "String used to separate columns inside input file",
-   "inputFileSeparator");
+   "inputFileSeparator"),
+   window(false, 1, 1,
+   "sliding_window_size",
+   "Sliding window size as percentage of the whole signal size",
+   "window");
+ 
    
    private boolean mandatory = false;
    private int maxNumOfArguments = 0;

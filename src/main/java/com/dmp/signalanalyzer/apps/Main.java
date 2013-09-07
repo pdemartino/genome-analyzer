@@ -67,27 +67,27 @@ public class Main {
                  configurationManager.getConfigurationValue(PropertiesEnum.normalizeUsingPosition.name()));
       }
 
-      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.smoothingFactor.name())) {
          filterConfiguration.set(PropertiesEnum.smoothingFactor.name(),
                  configurationManager.getConfigurationValue(PropertiesEnum.smoothingFactor.name()));
       }
 
-      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
-         filterConfiguration.set(PropertiesEnum.stepSize.name(),
-                 configurationManager.getConfigurationValue(PropertiesEnum.stepSize.name()));
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.step.name())) {
+         filterConfiguration.set(PropertiesEnum.step.name(),
+                 configurationManager.getConfigurationValue(PropertiesEnum.step.name()));
       }
 
-      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
-         filterConfiguration.set(PropertiesEnum.windowsSize.name(),
-                 configurationManager.getConfigurationValue(PropertiesEnum.windowsSize.name()));
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.window.name())) {
+         filterConfiguration.set(PropertiesEnum.window.name(),
+                 configurationManager.getConfigurationValue(PropertiesEnum.window.name()));
       }
 
-      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.backward.name())) {
          filterConfiguration.set(PropertiesEnum.backward.name(),
                  configurationManager.getConfigurationValue(PropertiesEnum.backward.name()));
       }
 
-      if (configurationManager.hasConfigurationValue(PropertiesEnum.normalizeUsingPosition.name())) {
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.twoWay.name())) {
          filterConfiguration.set(PropertiesEnum.twoWay.name(),
                  configurationManager.getConfigurationValue(PropertiesEnum.twoWay.name()));
       }

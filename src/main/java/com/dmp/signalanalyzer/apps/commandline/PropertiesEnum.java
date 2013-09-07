@@ -6,8 +6,8 @@ package com.dmp.signalanalyzer.apps.commandline;
  */
 public enum PropertiesEnum {
 
-   stepSize,
-   windowsSize,
+   step,
+   window,
    smoothingFactor,
    normalizeUsingPosition,
    backward,

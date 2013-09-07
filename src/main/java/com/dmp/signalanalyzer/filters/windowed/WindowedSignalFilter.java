@@ -4,25 +4,27 @@ package com.dmp.signalanalyzer.filters.windowed;
 import com.dmp.signalanalyzer.filters.SignalFilter;
 import com.dmp.signalanalyzer.signal.Signal;
 import com.dmp.signalanalyzer.utils.SAMath;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Pasquale De Martino <paco.dmp@gmail.com>
  */
 public abstract class WindowedSignalFilter extends SignalFilter {
-   public static Double windowMultiplier = 0.05;
+   private static final Logger logger = Logger.getLogger(WindowedSignalFilter.class.getName());
+   public static Double windowMultiplier = 0.01;
    public static Double stepMultiplier = 0.5;
 
     public Signal filter(Signal inputSignal) {
-        double winSize = filterConfiguration.get("window") != null
-                ? ((Double) filterConfiguration.get("window"))
-                : (double) ((inputSignal.getTStop() + inputSignal.getTStart()) / 2 * windowMultiplier);
+        double signalSize = inputSignal.getTStop() - inputSignal.getTStart();
+        double winMult = filterConfiguration.get("window") != null
+                ? (Double.valueOf((String)filterConfiguration.get("window")))
+                : this.windowMultiplier;
+        double winSize = winMult * signalSize;
 
-        double stSize = filterConfiguration.get("step") != null
-                ? ((Double) filterConfiguration.get("step"))
-                : (double) (winSize * stepMultiplier);
+        double stSize = (double) (winSize * stepMultiplier);
 
-
+        logger.info(String.format("Applying sliding window (win: %s, step: %s)",winSize,stSize));
         Signal windowedSignal = inputSignal.applySlidingWindow(winSize,stSize);
         // get statistics
         double[] minMaxLociSize = getMinMaxLociCount(windowedSignal);
