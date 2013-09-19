@@ -48,6 +48,7 @@ public class OutputManager {
       fwr.write("Region");
       fwr.write(separator + "Start");
       fwr.write(separator + "Stop");
+      fwr.write(separator + "Value");
       fwr.write(separator + "Mean");
       fwr.write(separator + "Max");
 
@@ -61,6 +62,7 @@ public class OutputManager {
          
          // Get values
          double[] values = p.getY();
+         fwr.write(separator + Double.toString(p.getValue()));
          fwr.write(separator + Double.toString(SAMath.average(values)));
          fwr.write(separator + Double.toString(SAMath.max(values)));
       }
