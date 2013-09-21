@@ -108,8 +108,7 @@ public class Main {
       for (String analysis : analysisToPerform) {
          logger.info("Running filter " + analysis +"...");
          Signal outSignal = filterRunner.run(inputSignal, analysis);
-         outputManager.writeToFile(outSignal, analysis, false);
-         outputManager.writeSelectedRegions(outSignal, analysis);
+         outputManager.writeToFile(outSignal, analysis, false, recombinationMap);  
       }
 
    }

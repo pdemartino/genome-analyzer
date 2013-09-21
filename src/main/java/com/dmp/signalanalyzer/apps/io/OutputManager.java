@@ -28,11 +28,11 @@ public class OutputManager {
    private Boolean appendDate = false;
    private RecombinationMap recombinationMap;
 
-   public void writeToFile(Signal signal, String filter, boolean selected) throws IOException {
-      writeToFile(signal, filter, selected, true);
+   public void writeToFile(Signal signal, String filter, boolean selected, RecombinationMap recombinationMap) throws IOException {
+      writeToFile(signal, filter, selected, true, recombinationMap);
    }
 
-   public void writeToFile(Signal signal, String filter, boolean selected, boolean bufferedWriting) throws IOException {
+   public void writeToFile(Signal signal, String filter, boolean selected, boolean bufferedWriting, RecombinationMap recombinationMap) throws IOException {
       String newLine = "\n";
       String separator = valueSeparator;
 
@@ -55,10 +55,16 @@ public class OutputManager {
       // values
       int regionId = 0;
       for (Signal p : signal) {
+    	 double start = recombinationMap != null
+    			 ? recombinationMap.getPosition(p.getTStart())
+    			 : p.getTStart();
+    	 double stop = recombinationMap != null
+    	 		 ? recombinationMap.getPosition(p.getTStop())
+    	 		 : p.getTStop();
          fwr.write(newLine);
          fwr.write(Integer.toString(++regionId));
-         fwr.write(separator + p.getTStart());
-         fwr.write(separator + p.getTStop());
+         fwr.write(separator + start);
+         fwr.write(separator + stop);
          
          // Get values
          double[] values = p.getY();
@@ -70,6 +76,7 @@ public class OutputManager {
       fwr.close();
    }
 
+   /*
    public void writeSelectedRegions(Signal signal, String filter) throws IOException {
       String filename = "regions." + fileExtension;
       filename = casDirectory(filter) + File.separator + filename;
@@ -134,7 +141,7 @@ public class OutputManager {
 
       fileWriter.close();
    }
-
+	*/
    private String getFilePath(String filter, boolean selected) {
       String finalDirectory = casDirectory(filter);
       if (finalDirectory != null) {
