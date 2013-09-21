@@ -32,7 +32,7 @@ public class OutputManager {
 	   // Write region signal
 	   this.writeToFile(signal, filter, null, recombinationMap);
 	   // Write flatted signal
-	   this.writeToFile(signal, filter, "-flatted", recombinationMap);
+	   this.writeToFile(signal.flat(), filter, "-flatted", recombinationMap);
    }
 
    private void writeToFile(Signal signal, String filter, String suffix, RecombinationMap recombinationMap) throws IOException {
