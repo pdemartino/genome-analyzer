@@ -27,16 +27,20 @@ public class OutputManager {
    private String valueSeparator = ",";
    private Boolean appendDate = false;
    private RecombinationMap recombinationMap;
-
-   public void writeToFile(Signal signal, String filter, boolean selected, RecombinationMap recombinationMap) throws IOException {
-      writeToFile(signal, filter, selected, true, recombinationMap);
+   
+   public void writeOutput(Signal signal, String filter, RecombinationMap recombinationMap) throws IOException{
+	   // Write region signal
+	   this.writeToFile(signal, filter, null, recombinationMap);
+	   // Write flatted signal
+	   this.writeToFile(signal, filter, "-flatted", recombinationMap);
    }
 
-   public void writeToFile(Signal signal, String filter, boolean selected, boolean bufferedWriting, RecombinationMap recombinationMap) throws IOException {
+   private void writeToFile(Signal signal, String filter, String suffix, RecombinationMap recombinationMap) throws IOException {
       String newLine = "\n";
       String separator = valueSeparator;
+      boolean bufferedWriting = true;
 
-      String filePath = getFilePath(filter, selected);
+      String filePath = getFilePath(filter, suffix);
       logger.info(String.format("Writing %s items into %s...", signal.count(), filePath));
       Writer fwr = new FileWriter(filePath);
 
@@ -142,12 +146,12 @@ public class OutputManager {
       fileWriter.close();
    }
 	*/
-   private String getFilePath(String filter, boolean selected) {
+   private String getFilePath(String filter, String suffix) {
       String finalDirectory = casDirectory(filter);
       if (finalDirectory != null) {
          return String.format("%s%s.%s",
                  finalDirectory + File.separator + "filtered",
-                 (selected ? "-selected" : ""),
+                 (suffix != null ? suffix : ""),
                  fileExtension);
       } else {
          return null;
