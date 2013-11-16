@@ -5,6 +5,7 @@ import com.dmp.signalanalyzer.filters.NeutralFilter;
 import com.dmp.signalanalyzer.filters.NinetiethPercentSelector;
 import com.dmp.signalanalyzer.filters.UnbiasFilter;
 import com.dmp.signalanalyzer.filters.smoothing.HaplotypeDelimiter;
+import com.dmp.signalanalyzer.filters.windowed.WindowedDensity;
 import com.dmp.signalanalyzer.filters.windowed.WindowedMeanAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedMedianAnalysis;
 import com.dmp.signalanalyzer.filters.windowed.WindowedNinetiethPercentileAnalysis;
@@ -29,6 +30,7 @@ public enum Filter {
    winNinetiethPerc(WindowedNinetiethPercentileAnalysis.class),
    winMean(WindowedMeanAnalysis.class),
    winMedian(WindowedMedianAnalysis.class),
+   winDensity(WindowedDensity.class),
 		   
    neutral(NeutralFilter.class);
    
