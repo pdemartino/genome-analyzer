@@ -59,7 +59,11 @@ public enum CommandLineOption {
    window(false, 1, 1,
    "sliding_window_size",
    "Sliding window size as percentage of the whole signal size",
-   "window");
+   "window"),
+   step(false, 1, 1,
+   "sliding_window_step",
+   "Sliding window step as multiplier of the chosen window size",
+   "step");
  
    
    private boolean mandatory = false;
