@@ -81,6 +81,11 @@ public class Main {
          filterConfiguration.set(PropertiesEnum.window.name(),
                  configurationManager.getConfigurationValue(PropertiesEnum.window.name()));
       }
+      
+      if (configurationManager.hasConfigurationValue(PropertiesEnum.step.name())) {
+         filterConfiguration.set(PropertiesEnum.step.name(),
+                 configurationManager.getConfigurationValue(PropertiesEnum.step.name()));
+      }
 
       if (configurationManager.hasConfigurationValue(PropertiesEnum.backward.name())) {
          filterConfiguration.set(PropertiesEnum.backward.name(),

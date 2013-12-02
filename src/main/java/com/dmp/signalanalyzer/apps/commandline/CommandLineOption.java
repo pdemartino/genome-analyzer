@@ -58,13 +58,12 @@ public enum CommandLineOption {
    "inputFileSeparator"),
    window(false, 1, 1,
    "sliding_window_size",
-   "Sliding window size as percentage of the whole signal size",
+   "Size of the sliding window",
    "window"),
-   step(false, 1, 1,
+   step(false,1,1,
    "sliding_window_step",
-   "Sliding window step as multiplier of the chosen window size",
+   "Forwarding step of the sliding window",
    "step");
- 
    
    private boolean mandatory = false;
    private int maxNumOfArguments = 0;
